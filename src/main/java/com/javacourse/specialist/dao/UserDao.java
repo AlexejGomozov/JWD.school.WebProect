@@ -5,7 +5,7 @@ import com.javacourse.specialist.exception.DaoException;
 import java.util.List;
 import java.util.Optional;
 
-public interface UserDAO {
+public interface UserDao {
     void addUser(Users user) throws DaoException;
     List<Users> findAllUser() throws DaoException;
     Optional<Users> findUserById(int id) throws DaoException;

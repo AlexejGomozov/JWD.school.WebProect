@@ -7,7 +7,7 @@ import com.javacourse.specialist.exception.DaoException;
 import java.util.Date;
 import java.util.List;
 
-public interface OrdersDAO {
+public interface OrdersDao {
         void addOrder(Orders order) throws DaoException;
         List<Orders> findOrdersByProcedureType(ProcedureType procedureType) throws DaoException;
         List<Orders> findOrdersByUsersId(int usersId) throws DaoException;

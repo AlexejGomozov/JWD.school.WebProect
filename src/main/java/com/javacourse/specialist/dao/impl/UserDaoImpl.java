@@ -1,8 +1,6 @@
 package com.javacourse.specialist.dao.impl;
 import com.javacourse.specialist.connection.ConnectionPool;
-import com.javacourse.specialist.dao.UserDAO;
-import com.javacourse.specialist.entity.RegistrationStatus;
-import com.javacourse.specialist.entity.UserRoles;
+import com.javacourse.specialist.dao.UserDao;
 import com.javacourse.specialist.entity.Users;
 import com.javacourse.specialist.exception.DaoException;
 import org.apache.logging.log4j.LogManager;
@@ -13,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UserDaoImpl<Connecton> implements UserDAO {
+public class UserDaoImpl<Connecton> implements UserDao {
     private static final Logger LOGGER = LogManager.getLogger();
     ConnectionPool connectionPool = ConnectionPool.getInstance();
 

@@ -15,40 +15,14 @@ import java.util.List;
 public class UserDaoImpl<Connecton> implements UserDAO {
     private static final Logger logger = LogManager.getLogger();
     ConnectionPool connectionPool = ConnectionPool.getInstance();
-//    Connection conn ; //= null;
-//
-//    {
-//        try {
-//            conn = connectionPool.getConnection();
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//    }
-
-//    private Connection getConnection() {
-//
-//        String connectionString = "jdbc:mysql://localhost:3306/specialist";
-//        String USERNAME = "root";
-//        String PASSWORD = "grt7832_2";
-//        Connection dbConnection = null;
-//        try {
-//            DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
-//            dbConnection = DriverManager.getConnection(connectionString, USERNAME, PASSWORD);
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//        return dbConnection;
-//    }
 
     @Override
     public void addUser(Users user) throws DaoException {
         Connection  dbConnection = connectionPool.getConnection();
-           // Connection dbConnection = null;
         PreparedStatement preparedStatement = null;
         try {
         String sqlQuery =
                 "INSERT INTO users (name, surname, phoneNumber, login, password, userRole, registrationStatus) VALUES(?, ?, ?, ?, ?, ?, ?)";
-            //Connection  dbConnection = connectionPool.getConnection();;//getConnection();
                 preparedStatement = dbConnection.prepareStatement(sqlQuery);
 
                 preparedStatement.setString(1, user.getName());
@@ -70,20 +44,18 @@ public class UserDaoImpl<Connecton> implements UserDAO {
             }catch(SQLException e){
                 logger.error("Exception while method addUser: " + e.getMessage());
             }
-        }
+          }
         }
 
 
     @Override
     public List<Users> findAllUser() throws DaoException {
         Connection dbConnection = connectionPool.getConnection();
-       // Connection dbConnection = null;
        Statement statement = null;
         List<Users> users = new ArrayList<>();
         try {
             String sqlQuery =
                     "SELECT id, name, surname phoneNumber, login, password, userRoles, registrationStatus FROM users";
-           // Connection dbConnection = connectionPool.getConnection();//getConnection();
             statement = dbConnection.createStatement();
 
             ResultSet resultSet = statement.executeQuery(sqlQuery);
@@ -100,7 +72,7 @@ public class UserDaoImpl<Connecton> implements UserDAO {
                 RegistrationStatus registrationStatus = new RegistrationStatus();
                 registrationStatus.setStatus(resultSet.getString("registration_status"));
 
-                users.add(user);  //add or other type of method?
+                users.add(user);
             }
         } catch (SQLException e) {
             logger.error("Exception while method getAllUser: " + e.getMessage());
@@ -120,13 +92,11 @@ public class UserDaoImpl<Connecton> implements UserDAO {
     public Users findUserById(int id) throws DaoException {
 
         Connection dbConnection = connectionPool.getConnection();
-        //Connection dbConnection = null;
         PreparedStatement preparedStatement = null;
         Users user = new Users();
         try {
-            String sqlQuery =                       //писать через нижнее подчеркив-е?
+            String sqlQuery =
                     "SELECT id, name, surname phone_number, login, password, role, status FROM users WHERE id=?";
-//          Connection dbConnection = connectionPool.getConnection();//getConnection();
             preparedStatement = dbConnection.prepareStatement(sqlQuery);
 
             preparedStatement.setInt(1, user.getId());
@@ -142,7 +112,6 @@ public class UserDaoImpl<Connecton> implements UserDAO {
                 userRole.setRole(resultSet.getString("role"));
                 RegistrationStatus registrationStatus = new RegistrationStatus();
                 registrationStatus.setStatus(resultSet.getString("status"));
-
             }
            user.setId(id);
         } catch (SQLException e) {
@@ -163,16 +132,14 @@ public class UserDaoImpl<Connecton> implements UserDAO {
         Connection dbConnection = connectionPool.getConnection();
         String sqlQuery = "DELETE FROM users WHERE id=?";
         PreparedStatement  preparedStatement = null;
-        //Connection dbConnection = null;
 
           try{
-              //dbConnection = connectionPool.getConnection();//getConnection();
               preparedStatement = dbConnection.prepareStatement(sqlQuery);
-             preparedStatement.setInt( 1, id);
-             preparedStatement.executeUpdate();
+              preparedStatement.setInt( 1, id);
+              preparedStatement.executeUpdate();
           }catch(SQLException e){
               logger.error("Exception while method removeUserById: " + e.getMessage());
-        }finally{
+        } finally {
               try{
                   if(preparedStatement != null){preparedStatement.close();}
                   if(dbConnection != null){ dbConnection.close();}

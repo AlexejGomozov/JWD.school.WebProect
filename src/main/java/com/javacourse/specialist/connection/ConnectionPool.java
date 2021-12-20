@@ -3,7 +3,6 @@ package com.javacourse.specialist.connection;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -36,7 +35,6 @@ public class ConnectionPool {
     private static final String DATABASE_DRIVER;
     private static final int DEFAULT_POOL_SIZE = 4;
     private int connNum;
-   // private static String SQL_VERIFCONN = "select 1";
 
     private static final Lock lockerConnection = new ReentrantLock();
     private static final AtomicBoolean isCreated = new AtomicBoolean();
@@ -72,8 +70,7 @@ public class ConnectionPool {
         for(int i = 0; i < DEFAULT_POOL_SIZE; i++){
             try {
                 ProxyConnection proxyConnection = getConnection();
-                //ProxyConnection proxyConnection = new ProxyConnection(connection);
-                freePool.add(proxyConnection);  //put(proxyConnection)
+                freePool.add(proxyConnection);
             } catch (DaoException e) {
                logger.error("Error for create connection: " + e.getMessage());
             }
@@ -92,7 +89,6 @@ public class ConnectionPool {
         }
         return instance;
     }
-    //__________________________________
 
    public ProxyConnection getConnection() throws DaoException{
        ProxyConnection conn = null;
@@ -113,16 +109,7 @@ public class ConnectionPool {
    }
 
 
-    public boolean returnConnection(ProxyConnection conn) {   //throws SQLException{  //???? void (or) boolean
-//       try {
-//           if (conn == null) {
-//               throw new DatabaseConnectionException();  //NullPointerException
-//           }
-//       }catch(DatabaseConnectionException e){
-//           logger.error("Exception into 'returnConnection' method, it's not connection"+ e.getMessage());
-//           return false; // здесь же можно вставить return если conn == null ???
-//       }
-
+    public boolean returnConnection(ProxyConnection conn) {
        try {
            if (!occupiedPool.remove(conn)) {
                throw new SQLException(
@@ -130,20 +117,17 @@ public class ConnectionPool {
            }
        }catch(SQLException e){
            logger.error( "The connection is returned alredy or it's not for this pool" + e.getMessage());
-           return false;  //???
+           return false;
        }
-       // if(conn instanceof  ProxyConnection) {   //if(conn instanceof  ProxyConnection conn) -подсвечивает
-            try {
+        try {
                 freePool.put(conn);
-                return true;   //?????
+                return true;
             } catch (InterruptedException e) {
                 logger.error("Exception into 'returnConnection' method: " + e.getMessage());
                 Thread.currentThread().interrupt();
-                return false;// здесь ???
+                return false;
             }
-        //return false;  //   или здесь???
         }
-    //}
 
 
     private boolean isFull(){

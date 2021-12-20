@@ -285,36 +285,6 @@ class ProxyConnection implements Connection {
     public int getNetworkTimeout() throws SQLException {
         return connection.getNetworkTimeout();
     }
-//_______________ подсвечивает красным (??)
-//    @Override
-//    public void beginRequest() throws SQLException {
-//        connection.beginRequest();
-//    }
-//
-//    @Override
-//    public void endRequest() throws SQLException {
-//        connection.endRequest();
-//    }
-//
-//    @Override
-//    public boolean setShardingKeyIfValid(ShardingKey shardingKey, ShardingKey superShardingKey, int timeout) throws SQLException {
-//        return connection.setShardingKeyIfValid(shardingKey, superShardingKey, timeout);
-//    }
-//
-//    @Override
-//    public boolean setShardingKeyIfValid(ShardingKey shardingKey, int timeout) throws SQLException {
-//        return connection.setShardingKeyIfValid(shardingKey, timeout);
-//    }
-//
-//    @Override
-//    public void setShardingKey(ShardingKey shardingKey, ShardingKey superShardingKey) throws SQLException {
-//        connection.setShardingKey(shardingKey, superShardingKey);
-//    }
-//
-//    @Override
-//    public void setShardingKey(ShardingKey shardingKey) throws SQLException {
-//        connection.setShardingKey(shardingKey);
-//    }
 
     @Override
     public <T> T unwrap(Class<T> iface) throws SQLException {

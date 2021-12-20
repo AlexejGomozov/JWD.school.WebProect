@@ -14,14 +14,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.javacourse.specialist.exception.DaoException;
-import com.javacourse.specialist.exception.DatabaseConnectionException;
+//import com.javacourse.specialist.exception.DatabaseConnectionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class ConnectionPool {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final Properties properties = new Properties();
+    private static final Properties PROPERTIES = new Properties();
     private static final String DATABASE_PROPERTIES = "db.properties";
 
     private static final String PROPERTY_URL = "db.url";
@@ -44,20 +44,20 @@ public class ConnectionPool {
 
     static{
         try(InputStream inputStream = ConnectionPool.class.getClassLoader().getResourceAsStream(DATABASE_PROPERTIES)) {
-            properties.load(inputStream);
-            DATABASE_USERNAME = properties.getProperty(PROPERTY_USERNAME);
-            DATABASE_PASSWORD = properties.getProperty(PROPERTY_PASSWORD);
-            DATABASE_URL = properties.getProperty(PROPERTY_URL);
-            DATABASE_DRIVER = properties.getProperty(PROPERTY_DRIVER);
+            PROPERTIES.load(inputStream);
+            DATABASE_USERNAME = PROPERTIES.getProperty(PROPERTY_USERNAME);
+            DATABASE_PASSWORD = PROPERTIES.getProperty(PROPERTY_PASSWORD);
+            DATABASE_URL = PROPERTIES.getProperty(PROPERTY_URL);
+            DATABASE_DRIVER = PROPERTIES.getProperty(PROPERTY_DRIVER);
             Class.forName(DATABASE_DRIVER);
         }catch(ClassNotFoundException e){
-            logger.fatal("Not register driver: " + properties.getProperty(PROPERTY_DRIVER), e);
+            LOGGER.fatal("Not register driver: " + PROPERTIES.getProperty(PROPERTY_DRIVER), e);
             throw new RuntimeException(e);
         }catch(FileNotFoundException e){
-            logger.fatal("Exception while properies load : " +  e.getMessage());
+            LOGGER.fatal("Exception while properies load : " +  e.getMessage());
             throw new RuntimeException(e);
         }catch(IOException e){
-            logger.fatal("Not load file: "+ e.getMessage());
+            LOGGER.fatal("Not load file: "+ e.getMessage());
             throw new RuntimeException(e);
         }
     }
@@ -72,7 +72,7 @@ public class ConnectionPool {
                 ProxyConnection proxyConnection = getConnection();
                 freePool.add(proxyConnection);
             } catch (DaoException e) {
-               logger.error("Error for create connection: " + e.getMessage());
+                LOGGER.error("Error for create connection: " + e.getMessage());
             }
         }
     }
@@ -102,7 +102,7 @@ public class ConnectionPool {
        }
            conn = makeAvailable(conn);
        } catch (InterruptedException e) {
-           logger.error("Exception into 'getConnection' method: " + e.getMessage());
+           LOGGER.error("Exception into 'getConnection' method: " + e.getMessage());
            Thread.currentThread().interrupt();
        }
        return conn;
@@ -116,14 +116,14 @@ public class ConnectionPool {
                        "The connection is returned alredy or it's not for this pool");
            }
        }catch(SQLException e){
-           logger.error( "The connection is returned alredy or it's not for this pool" + e.getMessage());
+           LOGGER.error( "The connection is returned alredy or it's not for this pool" + e.getMessage());
            return false;
        }
         try {
                 freePool.put(conn);
                 return true;
             } catch (InterruptedException e) {
-                logger.error("Exception into 'returnConnection' method: " + e.getMessage());
+            LOGGER.error("Exception into 'returnConnection' method: " + e.getMessage());
                 Thread.currentThread().interrupt();
                 return false;
             }
@@ -134,10 +134,14 @@ public class ConnectionPool {
         return ((freePool.size()==0) && (connNum>= DEFAULT_POOL_SIZE));
     }
 
-    private ProxyConnection createNewConnectionForPool()throws DaoException{
+    private ProxyConnection createNewConnectionForPool() throws DaoException {
         ProxyConnection conn = createNewConnection();
-        connNum++;
-        occupiedPool.add(conn);
+       lockerConnection.lock();
+       try {
+           connNum++;
+           occupiedPool.add(conn);
+       }finally{
+           lockerConnection.unlock();}
         return conn;
     }
 
@@ -148,7 +152,7 @@ public class ConnectionPool {
             DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
             conn = (ProxyConnection) DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
         }catch(SQLException e){
-            logger.error("Exception into 'createNewConnectionForPool' method: " + e.getMessage());
+            LOGGER.error("Exception into 'createNewConnectionForPool' method: " + e.getMessage());
             throw new DaoException(e);
         }
         return conn;
@@ -168,6 +172,7 @@ public class ConnectionPool {
    private ProxyConnection makeAvailable(ProxyConnection conn) throws DaoException {
         if(isConnectionAvailable(conn)){
             return conn;}
+        lockerConnection.lock();
        try {
            occupiedPool.remove(conn);
            connNum--;
@@ -182,8 +187,10 @@ public class ConnectionPool {
                     }catch(InterruptedException e){
                         throw new DaoException(e);
                     }
-                         return conn;
-                        }
+                    finally{lockerConnection.unlock();
+                    }
+                    return conn;
+    }
 
 
    private boolean isConnectionAvailable(ProxyConnection conn){
@@ -192,7 +199,7 @@ public class ConnectionPool {
             st.executeQuery(SQL_VERIFCONN);
             return true;
         }catch(SQLException e){
-            logger.error("Exception into 'isConnectionAvailable' method, connection it's not available: " + e.getMessage());
+            LOGGER.error("Exception into 'isConnectionAvailable' method, connection it's not available: " + e.getMessage());
             return false;
         }
    }
@@ -201,7 +208,7 @@ public class ConnectionPool {
            try {
                freePool.take().reallyClose();
            } catch (InterruptedException e) {
-              logger.error("Exception into 'destroyPool' method: " + e.getMessage());
+               LOGGER.error("Exception into 'destroyPool' method: " + e.getMessage());
            }
         }
    }

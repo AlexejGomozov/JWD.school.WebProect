@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 public interface OrdersDAO {
-
+        void addOrder(Orders order) throws DaoException;
         List<Orders> findOrdersByProcedureType(ProcedureType procedureType) throws DaoException;
         List<Orders> findOrdersByUsersId(int usersId) throws DaoException;
         List<Orders> findOrdersByDate(Date date) throws DaoException;
@@ -17,5 +17,6 @@ public interface OrdersDAO {
         String findOrderBySurname(String surname) throws DaoException;
         Orders createOrderByProcedureType(ProcedureType procedureType) throws DaoException;
         Orders createOrderByDate(Date date) throws DaoException;
+        void removeOrderById(int orderId) throws DaoException;
     }
 

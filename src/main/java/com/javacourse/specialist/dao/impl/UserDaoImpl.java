@@ -11,141 +11,83 @@ import org.apache.logging.log4j.Logger;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class UserDaoImpl<Connecton> implements UserDAO {
-    private static final Logger logger = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
     ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     @Override
     public void addUser(Users user) throws DaoException {
+        try(
         Connection  dbConnection = connectionPool.getConnection();
-        PreparedStatement preparedStatement = null;
-        try {
-        String sqlQuery =
-                "INSERT INTO users (name, surname, phoneNumber, login, password, userRole, registrationStatus) VALUES(?, ?, ?, ?, ?, ?, ?)";
-                preparedStatement = dbConnection.prepareStatement(sqlQuery);
-
+        PreparedStatement  preparedStatement = dbConnection.prepareStatement(
+                "INSERT INTO users (name, surname, phone_number, login, password, role, status) VALUES(?, ?, ?, ?, ?, ?, ?)"))
+            {
                 preparedStatement.setString(1, user.getName());
                 preparedStatement.setString(2,user.getSurname());
                 preparedStatement.setInt(3, user.getPhoneNumber());
                 preparedStatement.setString(4,user.getLogin());
                 preparedStatement.setString(5,user.getPassword());
-                preparedStatement.setString(6,user.getUserRole().getRole());
-                preparedStatement.setString(7,user.getRegistrationStatus().getStatus());
+                preparedStatement.setString(6,user.getUserRole().toString());
+                preparedStatement.setString(7,user.getRegistrationStatus().toString());
 
             preparedStatement.executeUpdate();
-
         } catch (SQLException e) {
-            logger.error("Exception while method addUser: " + e.getMessage());
-        } finally{
-            try{
-                if(preparedStatement != null){ preparedStatement.close();}
-                if(dbConnection != null){ dbConnection.close();}
-            }catch(SQLException e){
-                logger.error("Exception while method addUser: " + e.getMessage());
-            }
-          }
+            LOGGER.error("Exception while method addUser: " + e.getMessage());
         }
+    }
 
 
     @Override
     public List<Users> findAllUser() throws DaoException {
-        Connection dbConnection = connectionPool.getConnection();
-       Statement statement = null;
         List<Users> users = new ArrayList<>();
-        try {
-            String sqlQuery =
-                    "SELECT id, name, surname phoneNumber, login, password, userRoles, registrationStatus FROM users";
-            statement = dbConnection.createStatement();
-
-            ResultSet resultSet = statement.executeQuery(sqlQuery);
+        try (Connection dbConnection = connectionPool.getConnection();
+          Statement  statement = dbConnection.createStatement();
+            ResultSet resultSet = statement.executeQuery(
+                    "SELECT id, name, surname phone_number, login, password, role, status FROM users"))
+            {
             while(resultSet.next()){
-                Users user = new Users();
-                user.setId(resultSet.getInt("id"));
-                user.setName(resultSet.getString("name"));
-                user.setSurname(resultSet.getString("surname"));
-                user.setPhoneNumber(resultSet.getInt("phonenumber"));
-                user.setLogin(resultSet.getString("login"));
-                user.setPassword(resultSet.getString("password"));
-                UserRoles userRoles = new UserRoles();
-                userRoles.setRole(resultSet.getString("user_roles"));
-                RegistrationStatus registrationStatus = new RegistrationStatus();
-                registrationStatus.setStatus(resultSet.getString("registration_status"));
-
+                Users user = UserCreator.create(resultSet);
                 users.add(user);
             }
+            return users;
         } catch (SQLException e) {
-            logger.error("Exception while method getAllUser: " + e.getMessage());
-        } finally{
-            try{
-                if(statement != null){ statement.close();}
-                if(dbConnection != null){ dbConnection.close();}
-            }catch(SQLException e){
-                logger.error("Exception while method getAllUser: " + e.getMessage());
-            }
+            LOGGER.error("Exception while method getAllUser: " + e.getMessage());
+            throw new DaoException(e);
         }
-        return users;
     }
 
-
     @Override
-    public Users findUserById(int id) throws DaoException {
-
-        Connection dbConnection = connectionPool.getConnection();
-        PreparedStatement preparedStatement = null;
-        Users user = new Users();
-        try {
-            String sqlQuery =
-                    "SELECT id, name, surname phone_number, login, password, role, status FROM users WHERE id=?";
-            preparedStatement = dbConnection.prepareStatement(sqlQuery);
-
-            preparedStatement.setInt(1, user.getId());
-
+    public Optional<Users> findUserById(int id) throws DaoException {
+        Optional<Users> userOptional = Optional.empty();
+        try (Connection dbConnection = connectionPool.getConnection();
+          PreparedStatement preparedStatement = dbConnection.prepareStatement(
+                  "SELECT id, name, surname phone_number, login, password, role, status FROM users WHERE id=?"))
+            {
+            preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                user.setName(resultSet.getString("name"));
-                user.setSurname(resultSet.getString("surname"));
-                user.setPhoneNumber(resultSet.getInt("phone_number"));
-                user.setLogin(resultSet.getString("login"));
-                user.setPassword(resultSet.getString("password"));
-                UserRoles userRole = new UserRoles();
-                userRole.setRole(resultSet.getString("role"));
-                RegistrationStatus registrationStatus = new RegistrationStatus();
-                registrationStatus.setStatus(resultSet.getString("status"));
+                Users user = UserCreator.create(resultSet);
+                userOptional = Optional.of(user);
             }
-           user.setId(id);
+         return userOptional;
         } catch (SQLException e) {
-            logger.error("Exception while method getUserById: " + e.getMessage());
-        } finally{
-            try{
-                if(preparedStatement != null){ preparedStatement.close();}
-                if(dbConnection != null){ dbConnection.close();}
-            }catch(SQLException e){
-                logger.error("Exception while method getUserById: " + e.getMessage());
-            }
+            LOGGER.error("Exception while method getUserById: " + e.getMessage());
+            throw new DaoException(e);
         }
-        return user;
     }
 
     @Override
     public void removeUserById(int id) throws DaoException {
-        Connection dbConnection = connectionPool.getConnection();
-        String sqlQuery = "DELETE FROM users WHERE id=?";
-        PreparedStatement  preparedStatement = null;
-
-          try{
-              preparedStatement = dbConnection.prepareStatement(sqlQuery);
+        try (Connection dbConnection = connectionPool.getConnection();
+              PreparedStatement  preparedStatement = dbConnection.prepareStatement(
+                      "DELETE FROM users WHERE id=?"))
+             {
               preparedStatement.setInt( 1, id);
               preparedStatement.executeUpdate();
           }catch(SQLException e){
-              logger.error("Exception while method removeUserById: " + e.getMessage());
-        } finally {
-              try{
-                  if(preparedStatement != null){preparedStatement.close();}
-                  if(dbConnection != null){ dbConnection.close();}
-              }catch(SQLException e){
-                  logger.error("Exception while method 'removeUserById': " + e.getMessage());
-              }
-          }
+            LOGGER.error("Exception while method removeUserById: " + e.getMessage());
+        }
     }
 }

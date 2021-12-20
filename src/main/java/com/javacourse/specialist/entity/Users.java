@@ -10,7 +10,15 @@ public class Users {
     private UserRoles role;
     private RegistrationStatus status;
 
+    public enum UserRoles{
+        ADMIN, CLIENT
+    }
+    public enum RegistrationStatus{
+        IN_PROCESS, REGISTERED,  NOT_REGISTERED
+    }
+
     public Users(){}
+    public Users(UserRoles role){}
 
     public int getId(){return id;}
     public String getName(){return name;}

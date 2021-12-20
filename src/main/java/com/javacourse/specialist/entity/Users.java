@@ -11,15 +11,6 @@ public class Users {
     private RegistrationStatus status;
 
     public Users(){}
-//    public Users(String name, String surname, int phoneNumber, String login, String password, UserRoles role, RegistrationStatus status){
-//        this.name = name;
-//        this.surname = surname;
-//        this.phoneNumber = phoneNumber;
-//        this.login = login;
-//        this.password = password;
-//        this.role = role;
-//        this.status = status;
-//    }
 
     public int getId(){return id;}
     public String getName(){return name;}

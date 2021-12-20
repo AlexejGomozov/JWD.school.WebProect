@@ -5,18 +5,11 @@ import java.util.Date;
 public class Datetime {
 
     private int datetimeId;
-    private Date date; // int ?
+    private Date date;
     private String dayOfWeek;
     private int procedureStatusId;
 
     public Datetime(){}
-
-//    public Datetime(int datetimeId, Date date, String dayOfWeek, int procedureStatusId){
-//        this.datetimeId = datetimeId;
-//        this.date = date;
-//        this.dayOfWeek = dayOfWeek;
-//        this.procedureStatusId = procedureStatusId;
-//    }
 
     public int getDatetimeId() {
         return datetimeId;
@@ -49,5 +42,6 @@ public class Datetime {
     public void setProcedureStatusId(int procedureStatusId) {
         this.procedureStatusId = procedureStatusId;
     }
+
     //todo equals hashCode toString
 }

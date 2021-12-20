@@ -11,16 +11,6 @@ public class Orders {
 
     public Orders(){}
 
-//    public Orders(int ordersId, int procedureAmount, int discount, int usersId, int specialistId, int procedureTypeId, int datetimeId){
-//        this.ordersId = ordersId;
-//        this.procedureAmount = procedureAmount;
-//        this.discount = discount;
-//        this.usersId = usersId;
-//        this.specialistId = specialistId;
-//        this.procedureTypeId = procedureTypeId;
-//        this.datetimeId = datetimeId;
-//    }
-
     public int getOrdersId() {
         return ordersId;
     }
@@ -76,5 +66,6 @@ public class Orders {
     public void setDatetimeId(int datetimeId) {
         this.datetimeId = datetimeId;
     }
+
     //todo equals hashcode toString
 }

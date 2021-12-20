@@ -5,12 +5,10 @@ public class UserRoles {
     private int userRolesId;
     private String role;
 
-    public UserRoles(){}
+    public static final String ROLE_ADMIN = "admin";
+    public static final String ROLE_CLIENT = "client";
 
-//    public UserRoles(int userRolesId, String role){
-//        this.userRolesId = userRolesId;
-//        this.role = role;
-//    }
+    public UserRoles(){}
 
     public int getUserRolesId() {
         return userRolesId;
@@ -27,5 +25,6 @@ public class UserRoles {
     public void setRole(String role) {
         this.role = role;
     }
+
     // todo hashCode equals toString
 }

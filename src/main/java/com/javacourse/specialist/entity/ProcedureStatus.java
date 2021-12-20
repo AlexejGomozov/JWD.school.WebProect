@@ -5,12 +5,10 @@ public class ProcedureStatus {
     private int procedureStatusId;
     private String status;
 
-    public ProcedureStatus(){}
+    public static final String STATUS_ACTIVE = "active";
+    public static final String STATUS_INACTIVE = "inactive";
 
-//    public ProcedureStatus(int procedureStatusId, String status){
-//        this.procedureStatusId = procedureStatusId;
-//        this.status = status;
-//    }
+    public ProcedureStatus(){}
 
     public int getProcedureStatusId() {
         return procedureStatusId;
@@ -27,5 +25,6 @@ public class ProcedureStatus {
     public void setStatus(String status) {
         this.status = status;
     }
+
     //todo equals hashCode toString
 }

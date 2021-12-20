@@ -5,12 +5,11 @@ public class RegistrationStatus {
     private int registrationStatusId;
     private String status;
 
-    public RegistrationStatus(){}
+    public static final String STATUS_IN_PROCESS = "in_process";
+    public static final String STATUS_REGISTERED = "registered";
+    public static final String STATUS_NOT_REGISTERED = "not_registered";
 
-//    public RegistrationStatus(int registrationStatusId, String status){
-//        this.registrationStatusId = registrationStatusId;
-//        this.status = status;
-//    }
+    public RegistrationStatus(){}
 
     public int getRegistrationStatusId() {
         return registrationStatusId;
@@ -27,5 +26,6 @@ public class RegistrationStatus {
     public void setStatus(String status) {
         this.status = status;
     }
+
     //todo equals hashCode toString
 }

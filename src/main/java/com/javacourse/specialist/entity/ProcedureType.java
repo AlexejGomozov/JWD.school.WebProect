@@ -8,12 +8,6 @@ public class ProcedureType {
 
     public ProcedureType(){}
 
-//    public ProcedureType(int procedureTypeId, int duration, double price){
-//        this.procedureTypeId = procedureTypeId;
-//        this.duration = duration;
-//        this.price = price;
-//    }
-
     public int getProcedureTypeId() {
         return procedureTypeId;
     }
@@ -45,5 +39,6 @@ public class ProcedureType {
     public void setPrice(double price) {
         this.price = price;
     }
+
     //todo equals hashCode toString
 }

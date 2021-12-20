@@ -8,12 +8,6 @@ public class Specialists {
 
     public Specialists(){}
 
-//    public Specialists(int specialistsId, String image, String qualification){
-//        this.specialistsId = specialistsId;
-//        this.image = image;
-//        this.qualification = qualification;
-//    }
-
     public int getSpecialistsId() {
         return specialistsId;
     }
@@ -37,5 +31,6 @@ public class Specialists {
     public void setQualification(String qualification) {
         this.qualification = qualification;
     }
+
     //todo equals hashCode toString
 }

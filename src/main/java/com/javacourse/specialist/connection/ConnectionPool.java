@@ -69,7 +69,7 @@ public class ConnectionPool {
 
         for(int i = 0; i < POOL_SIZE; i++){
             try {
-                Connection connection = getConnection();
+                Connection connection = createNewConnection();
                 freePool.add((ProxyConnection) connection);
             } catch (DaoException e) {
                 LOGGER.error("Error for create connection: " + e.getMessage());
@@ -113,7 +113,7 @@ public class ConnectionPool {
             return !isRelease;
         }
             try {
-                freePool.put((ProxyConnection) conn);
+                freePool.put((ProxyConnection)conn);
                 return isRelease;
             } catch(InterruptedException e){
                 LOGGER.error("Exception into 'returnConnection' method: " + e.getMessage());
@@ -137,9 +137,9 @@ public class ConnectionPool {
     }
 
 
-   private ProxyConnection makeAvailable(ProxyConnection conn) throws DaoException {
+   private ProxyConnection makeAvailable(Connection conn) throws DaoException {
         if(isConnectionAvailable(conn)){
-            return conn;}
+            return (ProxyConnection) conn;}
         lockerConnection.lock();
        try {
            occupiedPool.remove(conn);
@@ -150,18 +150,18 @@ public class ConnectionPool {
        }
                     try {
                         conn = createNewConnection();
-                        occupiedPool.put(conn);
+                        occupiedPool.put((ProxyConnection) conn);
                         connCount++;
                     }catch(InterruptedException e){
                         throw new DaoException(e);
                     }
                     finally{lockerConnection.unlock();
                     }
-                    return conn;
+                    return (ProxyConnection) conn;
     }
 
 
-   private boolean isConnectionAvailable(ProxyConnection conn){
+   private boolean isConnectionAvailable(Connection conn){
         String SQL_VERIFCONN = "select 1";
         try(Statement st = conn.createStatement()){
             st.executeQuery(SQL_VERIFCONN);

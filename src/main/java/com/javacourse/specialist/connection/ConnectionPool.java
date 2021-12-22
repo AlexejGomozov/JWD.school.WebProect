@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.javacourse.specialist.exception.DaoException;
+import com.javacourse.specialist.exception.DatabaseConnectionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -71,7 +71,7 @@ public class ConnectionPool {
             try {
                 Connection connection = createNewConnection();
                 freePool.add((ProxyConnection) connection);
-            } catch (DaoException e) {
+            } catch (DatabaseConnectionException e) {
                 LOGGER.error("Error for create connection: " + e.getMessage());
             }
         }
@@ -90,7 +90,7 @@ public class ConnectionPool {
         return instance;
     }
 
-    public Connection getConnection() throws DaoException{
+    public Connection getConnection() throws DatabaseConnectionException {
         ProxyConnection conn = null;
         try {
             conn = freePool.take();
@@ -123,21 +123,21 @@ public class ConnectionPool {
         }
 
 
-    private ProxyConnection createNewConnection() throws DaoException{
+    private ProxyConnection createNewConnection() throws DatabaseConnectionException{
 
-            ProxyConnection conn = null;
+            ProxyConnection conn;
         try {
             DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
             conn = (ProxyConnection) DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
         }catch(SQLException e){
             LOGGER.error("Exception into 'createNewConnectionForPool' method: " + e.getMessage());
-            throw new DaoException(e);
+            throw new DatabaseConnectionException(e);
         }
         return conn;
     }
 
 
-   private ProxyConnection makeAvailable(Connection conn) throws DaoException {
+   private ProxyConnection makeAvailable(Connection conn) throws DatabaseConnectionException {
         if(isConnectionAvailable(conn)){
             return (ProxyConnection) conn;}
         lockerConnection.lock();
@@ -146,14 +146,14 @@ public class ConnectionPool {
            connCount--;
            conn.close();
        }catch(SQLException e){
-           throw new DaoException(e);
+           throw new DatabaseConnectionException(e);
        }
                     try {
                         conn = createNewConnection();
                         occupiedPool.put((ProxyConnection) conn);
                         connCount++;
                     }catch(InterruptedException e){
-                        throw new DaoException(e);
+                        throw new DatabaseConnectionException(e);
                     }
                     finally{lockerConnection.unlock();
                     }

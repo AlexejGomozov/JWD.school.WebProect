@@ -1,7 +1,7 @@
 package com.javacourse.specialist.dao.impl;
 import com.javacourse.specialist.connection.ConnectionPool;
 import com.javacourse.specialist.dao.UserDao;
-import com.javacourse.specialist.entity.Users;
+import com.javacourse.specialist.entity.User;
 import com.javacourse.specialist.exception.DaoException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,12 +15,16 @@ public class UserDaoImpl<Connecton> implements UserDao {
     private static final Logger LOGGER = LogManager.getLogger();
     ConnectionPool connectionPool = ConnectionPool.getInstance();
 
+    private static final String ADD_USER = "INSERT INTO users (name, surname, phone_number, login, password, role, status) VALUES(?, ?, ?, ?, ?, ?, ?)";
+    private static final String FIND_ALL_USERS = "SELECT id, name, surname phone_number, login, password, role, status FROM users";
+    private static final String FIND_USER_BY_ID = "SELECT id, name, surname phone_number, login, password, role, status FROM users WHERE id=?";
+    private static final String REMOVE_USER_BY_ID = "DELETE FROM users WHERE id=?";
+
     @Override
-    public void addUser(Users user) throws DaoException {
+    public void addUser(User user) throws DaoException {
         try(
         Connection  dbConnection = connectionPool.getConnection();
-        PreparedStatement  preparedStatement = dbConnection.prepareStatement(
-                "INSERT INTO users (name, surname, phone_number, login, password, role, status) VALUES(?, ?, ?, ?, ?, ?, ?)"))
+        PreparedStatement  preparedStatement = dbConnection.prepareStatement(ADD_USER))
             {
                 preparedStatement.setString(1, user.getName());
                 preparedStatement.setString(2,user.getSurname());
@@ -33,20 +37,20 @@ public class UserDaoImpl<Connecton> implements UserDao {
             preparedStatement.executeUpdate();
         } catch (SQLException e) {
             LOGGER.error("Exception while method addUser: " + e.getMessage());
+            throw new DaoException(e);
         }
     }
 
 
     @Override
-    public List<Users> findAllUser() throws DaoException {
-        List<Users> users = new ArrayList<>();
+    public List<User> findAllUser() throws DaoException {
+        List<User> users = new ArrayList<>();
         try (Connection dbConnection = connectionPool.getConnection();
           Statement  statement = dbConnection.createStatement();
-            ResultSet resultSet = statement.executeQuery(
-                    "SELECT id, name, surname phone_number, login, password, role, status FROM users"))
+            ResultSet resultSet = statement.executeQuery(FIND_ALL_USERS))
             {
             while(resultSet.next()){
-                Users user = UserCreator.create(resultSet);
+                User user = UserCreator.create(resultSet);
                 users.add(user);
             }
             return users;
@@ -57,16 +61,15 @@ public class UserDaoImpl<Connecton> implements UserDao {
     }
 
     @Override
-    public Optional<Users> findUserById(int id) throws DaoException {
-        Optional<Users> userOptional = Optional.empty();
+    public Optional<User> findUserById(int id) throws DaoException {
+        Optional<User> userOptional = Optional.empty();
         try (Connection dbConnection = connectionPool.getConnection();
-          PreparedStatement preparedStatement = dbConnection.prepareStatement(
-                  "SELECT id, name, surname phone_number, login, password, role, status FROM users WHERE id=?"))
+          PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_USER_BY_ID))
             {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                Users user = UserCreator.create(resultSet);
+                User user = UserCreator.create(resultSet);
                 userOptional = Optional.of(user);
             }
          return userOptional;
@@ -79,8 +82,7 @@ public class UserDaoImpl<Connecton> implements UserDao {
     @Override
     public void removeUserById(int id) throws DaoException {
         try (Connection dbConnection = connectionPool.getConnection();
-              PreparedStatement  preparedStatement = dbConnection.prepareStatement(
-                      "DELETE FROM users WHERE id=?"))
+              PreparedStatement  preparedStatement = dbConnection.prepareStatement(REMOVE_USER_BY_ID))
              {
               preparedStatement.setInt( 1, id);
               preparedStatement.executeUpdate();

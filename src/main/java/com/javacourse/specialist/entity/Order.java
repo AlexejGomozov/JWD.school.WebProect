@@ -1,22 +1,22 @@
 package com.javacourse.specialist.entity;
 
-public class Orders {
-    private int ordersId;
+public class Order {
+    private int orderId;
     private int procedureAmount;
     private int discount;
-    private int usersId;
+    private int userId;
     private int specialistId;
     private int procedureTypeId;
     private int datetimeId;
 
-    public Orders(){}
+    public Order(){}
 
-    public int getOrdersId() {
-        return ordersId;
+    public int getOrderId() {
+        return orderId;
     }
 
-    public void setOrdersId(int ordersId) {
-        this.ordersId = ordersId;
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 
     public int getProcedureAmount() {
@@ -35,12 +35,12 @@ public class Orders {
         this.discount = discount;
     }
 
-    public int getUsersId() {
-        return usersId;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setUsersId(int usersId) {
-        this.usersId = usersId;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public int getSpecialistId() {

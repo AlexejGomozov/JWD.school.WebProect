@@ -1,19 +1,19 @@
 package com.javacourse.specialist.entity;
 
-public class Specialists {
+public class Specialist {
 
-    private int specialistsId;
+    private int specialistId;
     private String image;
     private String qualification;
 
-    public Specialists(){}
+    public Specialist(){}
 
     public int getSpecialistsId() {
-        return specialistsId;
+        return specialistId;
     }
 
     public void setSpecialistsId(int specialistsId) {
-        this.specialistsId = specialistsId;
+        this.specialistId = specialistId;
     }
 
     public String getImage() {

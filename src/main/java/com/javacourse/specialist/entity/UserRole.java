@@ -1,21 +1,21 @@
 package com.javacourse.specialist.entity;
 
-public class UserRoles {
+public class UserRole {
 
-    private int userRolesId;
+    private int userRoleId;
     private String role;
 
     public static final String ROLE_ADMIN = "admin";
     public static final String ROLE_CLIENT = "client";
 
-    public UserRoles(){}
+    public UserRole(){}
 
-    public int getUserRolesId() {
-        return userRolesId;
+    public int getUserRoleId() {
+        return userRoleId;
     }
 
-    public void setUserRolesId(int userRolesId) {
-        this.userRolesId = userRolesId;
+    public void setUserRoleId(int userRolesId) {
+        this.userRoleId = userRoleId;
     }
 
     public String getRole() {

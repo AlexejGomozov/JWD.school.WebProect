@@ -3,6 +3,7 @@ package com.javacourse.specialist.connection;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -14,7 +15,6 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.javacourse.specialist.exception.DaoException;
-//import com.javacourse.specialist.exception.DatabaseConnectionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,14 +33,14 @@ public class ConnectionPool {
     private static final String DATABASE_USERNAME;
     private static final String  DATABASE_PASSWORD;
     private static final String DATABASE_DRIVER;
-    private static final int DEFAULT_POOL_SIZE = 4;
-    private int connNum;
+    private static final int POOL_SIZE = 4;
+    private int connCount;
 
     private static final Lock lockerConnection = new ReentrantLock();
     private static final AtomicBoolean isCreated = new AtomicBoolean();
-    BlockingQueue<ProxyConnection> freePool;
-    BlockingQueue<ProxyConnection> occupiedPool;
-    private static ConnectionPool instance = null;
+    private BlockingQueue<ProxyConnection> freePool;
+    private BlockingQueue<ProxyConnection> occupiedPool;
+    private static ConnectionPool instance;
 
     static{
         try(InputStream inputStream = ConnectionPool.class.getClassLoader().getResourceAsStream(DATABASE_PROPERTIES)) {
@@ -64,13 +64,13 @@ public class ConnectionPool {
 
 
     private ConnectionPool(){
-        freePool = new LinkedBlockingDeque<>(DEFAULT_POOL_SIZE);
-        occupiedPool = new LinkedBlockingDeque<>(DEFAULT_POOL_SIZE);
+        freePool = new LinkedBlockingDeque<>(POOL_SIZE);
+        occupiedPool = new LinkedBlockingDeque<>(POOL_SIZE);
 
-        for(int i = 0; i < DEFAULT_POOL_SIZE; i++){
+        for(int i = 0; i < POOL_SIZE; i++){
             try {
-                ProxyConnection proxyConnection = getConnection();
-                freePool.add(proxyConnection);
+                Connection connection = getConnection();
+                freePool.add((ProxyConnection) connection);
             } catch (DaoException e) {
                 LOGGER.error("Error for create connection: " + e.getMessage());
             }
@@ -90,60 +90,39 @@ public class ConnectionPool {
         return instance;
     }
 
-   public ProxyConnection getConnection() throws DaoException{
-       ProxyConnection conn = null;
-       if(isFull()){
-           throw new DaoException("The connection is full");
-       }
-       try {
-           conn = getConnectionFromPool();
-       if(conn == null){
-           conn = createNewConnectionForPool();
-       }
-           conn = makeAvailable(conn);
-       } catch (InterruptedException e) {
-           LOGGER.error("Exception into 'getConnection' method: " + e.getMessage());
-           Thread.currentThread().interrupt();
-       }
-       return conn;
-   }
-
-
-    public boolean returnConnection(ProxyConnection conn) {
-       try {
-           if (!occupiedPool.remove(conn)) {
-               throw new SQLException(
-                       "The connection is returned alredy or it's not for this pool");
-           }
-       }catch(SQLException e){
-           LOGGER.error( "The connection is returned alredy or it's not for this pool" + e.getMessage());
-           return false;
-       }
+    public Connection getConnection() throws DaoException{
+        ProxyConnection conn = null;
         try {
-                freePool.put(conn);
+            conn = freePool.take();
+            occupiedPool.put(conn);
+            conn = makeAvailable(conn);
+
+        } catch (InterruptedException e) {
+            LOGGER.error("Exception into 'getConnection' method: " + e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+        return conn;
+    }
+
+
+
+    public boolean returnConnection(Connection conn) {
+
+        if (!occupiedPool.remove(conn)) {
+            LOGGER.error("The connection is returned alredy or it's not for this pool");
+            return false;
+        } else {
+            try {
+                freePool.put((ProxyConnection) conn);
                 return true;
-            } catch (InterruptedException e) {
-            LOGGER.error("Exception into 'returnConnection' method: " + e.getMessage());
+            } catch(InterruptedException e){
+                LOGGER.error("Exception into 'returnConnection' method: " + e.getMessage());
                 Thread.currentThread().interrupt();
                 return false;
             }
         }
-
-
-    private boolean isFull(){
-        return ((freePool.size()==0) && (connNum>= DEFAULT_POOL_SIZE));
     }
-
-    private ProxyConnection createNewConnectionForPool() throws DaoException {
-        ProxyConnection conn = createNewConnection();
-       lockerConnection.lock();
-       try {
-           connNum++;
-           occupiedPool.add(conn);
-       }finally{
-           lockerConnection.unlock();}
-        return conn;
-    }
+    
 
     private ProxyConnection createNewConnection() throws DaoException{
 
@@ -159,23 +138,13 @@ public class ConnectionPool {
     }
 
 
-   private ProxyConnection getConnectionFromPool() throws InterruptedException {
-        ProxyConnection conn = null;
-        if(freePool.size() > 0){
-                conn = freePool.take();
-                occupiedPool.put(conn);
-        }
-       return conn;
-   }
-
-
    private ProxyConnection makeAvailable(ProxyConnection conn) throws DaoException {
         if(isConnectionAvailable(conn)){
             return conn;}
         lockerConnection.lock();
        try {
            occupiedPool.remove(conn);
-           connNum--;
+           connCount--;
            conn.close();
        }catch(SQLException e){
            throw new DaoException(e);
@@ -183,7 +152,7 @@ public class ConnectionPool {
                     try {
                         conn = createNewConnection();
                         occupiedPool.put(conn);
-                        connNum++;
+                        connCount++;
                     }catch(InterruptedException e){
                         throw new DaoException(e);
                     }
@@ -204,7 +173,7 @@ public class ConnectionPool {
         }
    }
    public void destroyPool(){
-        for(int i = 0; i<DEFAULT_POOL_SIZE; i++){
+        for(int i = 0; i<POOL_SIZE; i++){
            try {
                freePool.take().reallyClose();
            } catch (InterruptedException e) {

@@ -1,6 +1,6 @@
 package com.javacourse.specialist.entity;
 
-public class Users {
+public class User {
     private int id;
     private String name;
     private String surname;
@@ -17,8 +17,8 @@ public class Users {
         IN_PROCESS, REGISTERED,  NOT_REGISTERED
     }
 
-    public Users(){}
-    public Users(UserRoles role){}
+    public User(){}
+    public User(UserRoles role){}
 
     public int getId(){return id;}
     public String getName(){return name;}

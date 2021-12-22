@@ -60,7 +60,7 @@ class ProxyConnection implements Connection {
         if(!connection.getAutoCommit()){
             connection.setAutoCommit(true);
         }
-        ConnectionPool.getInstance().returnConnection(this);
+        ConnectionPool.getInstance().releaseConnection(this);
     }
 
     void reallyClose() {

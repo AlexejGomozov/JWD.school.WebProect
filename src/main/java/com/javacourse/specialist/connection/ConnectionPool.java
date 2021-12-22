@@ -106,23 +106,22 @@ public class ConnectionPool {
 
 
 
-    public boolean returnConnection(Connection conn) {
-
+    public boolean releaseConnection(Connection conn) {
+       boolean isRelease = true;
         if (!occupiedPool.remove(conn)) {
             LOGGER.error("The connection is returned alredy or it's not for this pool");
-            return false;
-        } else {
+            return !isRelease;
+        }
             try {
                 freePool.put((ProxyConnection) conn);
-                return true;
+                return isRelease;
             } catch(InterruptedException e){
                 LOGGER.error("Exception into 'returnConnection' method: " + e.getMessage());
                 Thread.currentThread().interrupt();
-                return false;
+                return !isRelease;
             }
         }
-    }
-    
+
 
     private ProxyConnection createNewConnection() throws DaoException{
 

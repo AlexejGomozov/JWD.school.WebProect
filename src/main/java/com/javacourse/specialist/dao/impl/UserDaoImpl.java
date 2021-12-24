@@ -1,8 +1,10 @@
 package com.javacourse.specialist.dao.impl;
 import com.javacourse.specialist.connection.ConnectionPool;
 import com.javacourse.specialist.dao.UserDao;
+import com.javacourse.specialist.dao.mapper.UserCreator;
 import com.javacourse.specialist.entity.User;
 import com.javacourse.specialist.exception.DaoException;
+import com.javacourse.specialist.exception.DatabaseConnectionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +37,7 @@ public class UserDaoImpl<Connecton> implements UserDao {
                 preparedStatement.setString(7,user.getRegistrationStatus().toString());
 
             preparedStatement.executeUpdate();
-        } catch (SQLException e) {
+        } catch (SQLException | DatabaseConnectionException e) {
             LOGGER.error("Exception while method addUser: " + e.getMessage());
             throw new DaoException(e);
         }
@@ -43,7 +45,7 @@ public class UserDaoImpl<Connecton> implements UserDao {
 
 
     @Override
-    public List<User> findAllUser() throws DaoException {
+    public List<User> findAllUsers() throws DaoException {
         List<User> users = new ArrayList<>();
         try (Connection dbConnection = connectionPool.getConnection();
           Statement  statement = dbConnection.createStatement();
@@ -54,7 +56,7 @@ public class UserDaoImpl<Connecton> implements UserDao {
                 users.add(user);
             }
             return users;
-        } catch (SQLException e) {
+        } catch (SQLException | DatabaseConnectionException e) {
             LOGGER.error("Exception while method getAllUser: " + e.getMessage());
             throw new DaoException(e);
         }
@@ -73,7 +75,7 @@ public class UserDaoImpl<Connecton> implements UserDao {
                 userOptional = Optional.of(user);
             }
          return userOptional;
-        } catch (SQLException e) {
+        } catch (SQLException  | DatabaseConnectionException e) {
             LOGGER.error("Exception while method getUserById: " + e.getMessage());
             throw new DaoException(e);
         }
@@ -86,8 +88,9 @@ public class UserDaoImpl<Connecton> implements UserDao {
              {
               preparedStatement.setInt( 1, id);
               preparedStatement.executeUpdate();
-          }catch(SQLException e){
+          }catch(SQLException | DatabaseConnectionException e){
             LOGGER.error("Exception while method removeUserById: " + e.getMessage());
+            throw new DaoException(e);
         }
     }
 }

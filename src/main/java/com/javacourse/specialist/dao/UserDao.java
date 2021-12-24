@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface UserDao {
     void addUser(User user) throws DaoException;
-    List<User> findAllUser() throws DaoException;
+    List<User> findAllUsers() throws DaoException;
     Optional<User> findUserById(int id) throws DaoException;
     void removeUserById(int id) throws DaoException;
 }

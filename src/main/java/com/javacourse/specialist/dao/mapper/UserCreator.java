@@ -1,4 +1,4 @@
-package com.javacourse.specialist.dao.impl;
+package com.javacourse.specialist.dao.mapper;
 
 import com.javacourse.specialist.entity.User;
 import java.sql.ResultSet;
@@ -9,10 +9,10 @@ public class UserCreator {
 
     private UserCreator(){}
 
-    static User create(ResultSet resultSet) throws SQLException {
+    public static User create(ResultSet resultSet) throws SQLException {
       User user = new User();
 
-      user.setId(resultSet.getInt(USER_ID));
+        //user.setId(resultSet.getInt(USER_ID));
       user.setLogin(resultSet.getString(LOGIN));
       user.setPassword(resultSet.getString(PASSWORD));
       user.setName(resultSet.getString(NAME));

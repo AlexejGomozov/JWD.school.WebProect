@@ -44,7 +44,10 @@ public class OrderDaoImpl implements OrderDao {
             "SELECT o.order_id, o.procedure_amount, o.discount, o.user_id, o.specialist_id, o.procedure_id, o.datetime_id" +
                     " FROM order o JOIN users u ON o.user_id = u.user_id WHERE u.surname = ?";
     private static final String CREATE_ORDER_BY_PROCEDURE_ID_AND_USER_ID =
-            "INSER INTO orders";  //fixme
+            "INSERT INTO orders";  //fixme
+    private static final String CREATE_ORDER_BY_DATE_AND_USER =
+            "INSERT INTO orders";  //fixme
+    private static final String REMOVE_ORDER_BY_ID = "DELETE FROM orders WHERE  id=?";
 
     @Override
     public void createOrder(Order order) throws DaoException {
@@ -201,12 +204,20 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public Order insertOrderByDateAndUser(LocalDateTime date, User user) throws DaoException {
+    public Order createOrderByDateAndUser(LocalDateTime date, User user) throws DaoException {
         return null;
     }
 
     @Override
     public void removeOrderById(int orderId) throws DaoException {
-
+       try(Connection dbConnection = connectionPool.getConnection();
+           PreparedStatement preparedStatement = dbConnection.prepareStatement(REMOVE_ORDER_BY_ID))
+       {
+           preparedStatement.setInt(1, orderId);
+           preparedStatement.executeUpdate();
+       }catch(SQLException | DatabaseConnectionException e){
+           LOGGER.error("" + e);    //fixme
+           throw new DaoException(e);
+       }
     }
 }

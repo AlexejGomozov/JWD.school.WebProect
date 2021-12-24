@@ -19,7 +19,7 @@ public interface OrderDao {
         Optional<Order> findOrderByOrderId(int orderId) throws DaoException;
         List<Order> findOrderBySurname(String surname) throws DaoException;
         Order createOrderByProcedureIDAndUserID(int procedureId, int userId) throws DaoException;
-        Order insertOrderByDateAndUser(LocalDateTime date, User user) throws DaoException;
+        Order createOrderByDateAndUser(LocalDateTime date, User user) throws DaoException;
         void removeOrderById(int orderId) throws DaoException;
     }
 

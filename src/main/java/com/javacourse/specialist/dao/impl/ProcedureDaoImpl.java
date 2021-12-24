@@ -105,6 +105,5 @@ public class ProcedureDaoImpl implements ProcedureDao {
           LOGGER.error("" + e);  ////fixme
           throw new DaoException(e);
       }
-
     }
 }

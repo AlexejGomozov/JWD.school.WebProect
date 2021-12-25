@@ -43,10 +43,10 @@ public class OrderDaoImpl implements OrderDao {
     private static final String FIND_ORDER_BY_SURNAME =  // will check
             "SELECT o.order_id, o.procedure_amount, o.discount, o.user_id, o.specialist_id, o.procedure_id, o.datetime_id" +
                     " FROM order o JOIN users u ON o.user_id = u.user_id WHERE u.surname = ?";
-    private static final String CREATE_ORDER_BY_PROCEDURE_ID_AND_USER_ID =
-            "INSERT INTO orders";  //fixme
-    private static final String CREATE_ORDER_BY_DATE_AND_USER =
-            "INSERT INTO orders";  //fixme
+//    private static final String CREATE_ORDER_BY_PROCEDURE_ID_USER_ID_DATE_ID =
+//            "INSERT INTO orders";  //fixme
+//    private static final String CREATE_ORDER_BY_DATE_USER =
+//            "INSERT INTO orders";  //fixme
     private static final String REMOVE_ORDER_BY_ID = "DELETE FROM orders WHERE  id=?";
 
     @Override
@@ -64,7 +64,7 @@ public class OrderDaoImpl implements OrderDao {
 
           preparedStatement.executeUpdate();
       }catch(SQLException | DatabaseConnectionException e){
-          LOGGER.error("" + e);    //fixme
+          LOGGER.error("Exception thrown 'createOrder' method: " + e);
           throw new DaoException(e);
       }
     }
@@ -91,7 +91,7 @@ public class OrderDaoImpl implements OrderDao {
                 orders.add(order);
             }
             }catch(SQLException | DatabaseConnectionException e){
-                LOGGER.error("" + e); //fixme
+                LOGGER.error("Exception thrown 'findOrderByProcedureType' method: " + e);
                 throw new DaoException(e);
         }
         return orders;
@@ -113,7 +113,7 @@ public class OrderDaoImpl implements OrderDao {
             }
             return order;
         }catch(SQLException | DatabaseConnectionException e){
-            LOGGER.error(""+e);  //fixme
+            LOGGER.error("Exception thrown 'findOrderByUsersId' method: " +e);
             throw new DaoException(e);
         }
     }
@@ -124,7 +124,7 @@ public class OrderDaoImpl implements OrderDao {
         try (
                 Connection dbConnection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_ORDER_BY_DATE)) {
-            preparedStatement.setString(1, String.valueOf(date)); //java.sql.Date.valueOf(date));
+            preparedStatement.setString(1, String.valueOf(date));
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 Order order = new Order();
@@ -139,7 +139,7 @@ public class OrderDaoImpl implements OrderDao {
                 orders.add(order);
             }
         } catch (SQLException | DatabaseConnectionException e) {
-            LOGGER.error("" + e); //fixme
+            LOGGER.error("Exception thrown 'findOrderByDate' method: " + e);
             throw new DaoException(e);
         }
         return orders;
@@ -160,7 +160,7 @@ public class OrderDaoImpl implements OrderDao {
             }
             return order;
         }catch(SQLException | DatabaseConnectionException e){
-            LOGGER.error(""+e);  //fixme
+            LOGGER.error("Exception thrown 'findOrderByOrderId' method: " +e);
             throw new DaoException(e);
         }
     }
@@ -187,25 +187,10 @@ public class OrderDaoImpl implements OrderDao {
                 orders.add(order);
             }
         }catch(SQLException | DatabaseConnectionException e){
-            LOGGER.error("" + e); //fixme
+            LOGGER.error("Exception thrown 'findOrderBySurname' method: " + e);
             throw new DaoException(e);
         }
         return orders;
-    }
-
-    @Override
-    public Order createOrderByProcedureIDAndUserID(int procedureId, int userId) throws DaoException {
-
-
-
-
-
-        return null;
-    }
-
-    @Override
-    public Order createOrderByDateAndUser(LocalDateTime date, User user) throws DaoException {
-        return null;
     }
 
     @Override
@@ -216,7 +201,7 @@ public class OrderDaoImpl implements OrderDao {
            preparedStatement.setInt(1, orderId);
            preparedStatement.executeUpdate();
        }catch(SQLException | DatabaseConnectionException e){
-           LOGGER.error("" + e);    //fixme
+           LOGGER.error("Exception thrown 'removeOrderById' method: " + e);
            throw new DaoException(e);
        }
     }

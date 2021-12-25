@@ -7,7 +7,12 @@ public class Datetime {
     private int datetimeId;
     private Date date;
     private String dayOfWeek;
-    private int procedureStatusId;
+    private ProcedureStatus status;
+
+
+    public enum ProcedureStatus{
+        OPEN, CLOSED
+    }
 
     public Datetime(){}
 
@@ -35,12 +40,12 @@ public class Datetime {
         this.dayOfWeek = dayOfWeek;
     }
 
-    public int getProcedureStatusId() {
-        return procedureStatusId;
+    public ProcedureStatus getProcedureStatus() {
+        return status;
     }
 
-    public void setProcedureStatusId(int procedureStatusId) {
-        this.procedureStatusId = procedureStatusId;
+    public void setProcedureStatuS(ProcedureStatus status) {
+        this.status = status;
     }
 
     //todo equals hashCode toString

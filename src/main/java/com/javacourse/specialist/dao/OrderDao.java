@@ -15,11 +15,8 @@ public interface OrderDao {
         List<Order> findOrderByProcedureType(String procedureType) throws DaoException;
         Optional<Order> findOrderByUsersId(int userId) throws DaoException;
         List<Order> findOrderByDate(LocalDateTime date) throws DaoException;
-        //List<Orders> findOrdersByDayOfWeek
         Optional<Order> findOrderByOrderId(int orderId) throws DaoException;
         List<Order> findOrderBySurname(String surname) throws DaoException;
-        Order createOrderByProcedureIDAndUserID(int procedureId, int userId) throws DaoException;
-        Order createOrderByDateAndUser(LocalDateTime date, User user) throws DaoException;
         void removeOrderById(int orderId) throws DaoException;
     }
 

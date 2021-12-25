@@ -6,7 +6,7 @@ public class Order {
     private int discount;
     private int userId;
     private int specialistId;
-    private int procedureTypeId;
+    private int procedureId;
     private int datetimeId;
 
     public Order(){}
@@ -51,12 +51,12 @@ public class Order {
         this.specialistId = specialistId;
     }
 
-    public int getProcedureTypeId() {
-        return procedureTypeId;
+    public int getProcedureId() {
+        return procedureId;
     }
 
-    public void setProcedureTypeId(int procedureTypeId) {
-        this.procedureTypeId = procedureTypeId;
+    public void setProcedureId(int procedureId) {
+        this.procedureId = procedureId;
     }
 
     public int getDatetimeId() {

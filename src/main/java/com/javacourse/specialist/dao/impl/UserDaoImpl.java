@@ -43,7 +43,6 @@ public class UserDaoImpl<Connecton> implements UserDao {
         }
     }
 
-
     @Override
     public List<User> findAllUsers() throws DaoException {
         List<User> users = new ArrayList<>();

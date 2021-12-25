@@ -43,7 +43,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
 
          preparedStatement.executeUpdate();
      }catch(SQLException | DatabaseConnectionException e){
-         LOGGER.error("" + e);    //fixme
+         LOGGER.error("Exception thrown 'addProcedure' method: " + e);
          throw new DaoException(e);
 
      }
@@ -64,7 +64,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
          }
          return procedure;
         }catch(SQLException | DatabaseConnectionException e){
-            LOGGER.error(""+e);  //fixme
+            LOGGER.error("Exception thrown 'findProcedureById' method: " +e);
             throw new DaoException(e);
         }
     }
@@ -79,7 +79,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
             preparedStatement.setInt(1, userId);
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                Procedure procedure = new Procedure();    //ProcedureCreator.create(resultSet);
+                Procedure procedure = new Procedure();
                 procedure.setProcedureId(resultSet.getInt(PROCEDURE_ID));
                 procedure.setDuration(resultSet.getInt(PROCEDURE_DURATION));
                 procedure.setPrice(resultSet.getDouble(PROCEDURE_PRICE));
@@ -89,7 +89,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
             }
             return procedures;
         }catch(SQLException | DatabaseConnectionException e){
-            LOGGER.error(""+e);   //fixme
+            LOGGER.error("Exception thrown 'findProcedureByUserId' method: " +e);
             throw new DaoException(e);
         }
     }
@@ -102,7 +102,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
           preparedStatement.setInt(1, procedureId);
           preparedStatement.executeUpdate();
       }catch(SQLException | DatabaseConnectionException e){
-          LOGGER.error("" + e);  ////fixme
+          LOGGER.error("Exception thrown 'removeProcedureById' method: " + e);
           throw new DaoException(e);
       }
     }

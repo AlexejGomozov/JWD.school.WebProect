@@ -11,8 +11,6 @@ public class UserCreator {
 
     public static User create(ResultSet resultSet) throws SQLException {
       User user = new User();
-
-        //user.setId(resultSet.getInt(USER_ID));
       user.setLogin(resultSet.getString(LOGIN));
       user.setPassword(resultSet.getString(PASSWORD));
       user.setName(resultSet.getString(NAME));

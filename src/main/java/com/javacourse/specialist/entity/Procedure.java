@@ -1,19 +1,19 @@
 package com.javacourse.specialist.entity;
 
-public class ProcedureType {
-    private int procedureTypeId;
+public class Procedure {
+    private int procedureId;
     private String pocedureType;
     private int duration;
     private double price;
 
-    public ProcedureType(){}
+    public Procedure(){}
 
-    public int getProcedureTypeId() {
-        return procedureTypeId;
+    public int getProcedureId() {
+        return procedureId;
     }
 
-    public void setProcedureTypeId(int procedureTypeId) {
-        this.procedureTypeId = procedureTypeId;
+    public void setProcedureId(int procedureId) {
+        this.procedureId = procedureId;
     }
 
     public String getProcedureType(){

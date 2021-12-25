@@ -10,24 +10,18 @@ public final class ColumnName {
     public static final String PASSWORD = "password";
     public static final String USER_ROLE = "role";
     public static final String REGISTRATION_STATUS = "status";
-    /* roles table */
-   // public static final String USER_ROLE_ID = "id";
-   // public static final String USER_ROLE = "role";
-    /* roles status */
-   // public static final String REGISTRATION_STATUS_ID = "id";
-   // public static final String REGISTRATION_STATUS = "status";
-    /* specialist table*/
+    /* specialist table */
     public static final String SPECIALIST_ID = "id";
     public static final String SPECIALIST_IMAGE = "image";
     public static final String SPECEALIST_QUALIFICATION = "qualification";
+    public static final String SPECIALIST_NAME = "name";
+    public static final String SPECIALIST_LIST_PROCEDURES = "list_procedures";
+    public static final String SPECIALIST_WORK_EXPERIENCE = "work_experience";
     /* procedure type table */
     public static final String PROCEDURE_ID = "id";
     public static final String PROCEDURE_DURATION = "duration";
     public static final String PROCEDURE_PRICE = "price";
     public static final String PROCEDURE_TYPE = "procedure_type";
-    /* procedure_status table */
-   // public static final String PROCEDURE_STATUS_ID = "id";
-    //public static final String PROCEDURE_STATUS = "status";
     /* orders table */
     public static final String ORDER_ID = "id";
     public static final String ORDER_PROCEDURE_AMOUNT = "amount";

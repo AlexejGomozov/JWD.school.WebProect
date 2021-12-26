@@ -15,6 +15,7 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.javacourse.specialist.exception.DatabaseConnectionException;
+import com.mysql.cj.jdbc.Driver;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -127,7 +128,6 @@ public class ConnectionPool {
 
             ProxyConnection conn;
         try {
-            DriverManager.registerDriver(new com.mysql.cj.jdbc.Driver());
             conn = (ProxyConnection) DriverManager.getConnection(DATABASE_URL, DATABASE_USERNAME, DATABASE_PASSWORD);
         }catch(SQLException e){
             LOGGER.error("Exception into 'createNewConnectionForPool' method: " + e.getMessage());
@@ -179,5 +179,8 @@ public class ConnectionPool {
                LOGGER.error("Exception into 'destroyPool' method: " + e.getMessage());
            }
         }
+
+       //todo деригистрация драйвера  ????
+
    }
 }

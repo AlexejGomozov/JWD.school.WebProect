@@ -14,7 +14,7 @@ public class User {
         ADMIN, CLIENT
     }
     public enum RegistrationStatus{
-        IN_PROCESS, REGISTERED,  NOT_REGISTERED
+        REGISTERED,  NOT_REGISTERED   // IN_PROCESS,
     }
 
     public User(){}

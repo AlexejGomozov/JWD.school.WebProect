@@ -38,7 +38,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
              PreparedStatement preparedStatement = dbConnection.prepareStatement(ADD_PROCEDURE))
      {
          preparedStatement.setInt(1, procedure.getDuration());
-         preparedStatement.setDouble(2, procedure.getPrice());
+         preparedStatement.setBigDecimal(2, procedure.getPrice());
          preparedStatement.setString(3, procedure.getProcedureType());
 
          preparedStatement.executeUpdate();
@@ -82,7 +82,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
                 Procedure procedure = new Procedure();
                 procedure.setProcedureId(resultSet.getInt(PROCEDURE_ID));
                 procedure.setDuration(resultSet.getInt(PROCEDURE_DURATION));
-                procedure.setPrice(resultSet.getDouble(PROCEDURE_PRICE));
+                procedure.setPrice(resultSet.getBigDecimal(PROCEDURE_PRICE));
                 procedure.setProcedureType(resultSet.getString(PROCEDURE_TYPE));
 
                 procedures.add(procedure);

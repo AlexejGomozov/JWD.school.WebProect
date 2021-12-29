@@ -1,10 +1,12 @@
 package com.javacourse.specialist.entity;
 
+import java.math.BigDecimal;
+
 public class Procedure {
     private int procedureId;
     private String pocedureType;
     private int duration;
-    private double price;
+    private BigDecimal price;
 
     public Procedure(){}
 
@@ -32,11 +34,11 @@ public class Procedure {
         this.duration = duration;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

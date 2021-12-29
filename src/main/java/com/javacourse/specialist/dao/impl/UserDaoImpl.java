@@ -13,13 +13,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class UserDaoImpl<Connecton> implements UserDao {
+public class UserDaoImpl implements UserDao {
     private static final Logger LOGGER = LogManager.getLogger();
     ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     private static final String ADD_USER = "INSERT INTO users (name, surname, phone_number, login, password, role, status) VALUES(?, ?, ?, ?, ?, ?, ?)";
-    private static final String FIND_ALL_USERS = "SELECT id, name, surname phone_number, login, password, role, status FROM users";
-    private static final String FIND_USER_BY_ID = "SELECT id, name, surname phone_number, login, password, role, status FROM users WHERE id=?";
+    private static final String FIND_ALL_USERS = "SELECT id, name, surname, phone_number, login, password, role, status FROM users";
+    private static final String FIND_USER_BY_PHONE = "SELECT id, name, surname, phone_number, login, password, role, status FROM users WHERE phone_number=?";
+    private static final String FIND_USER_BY_ID = "SELECT id, name, surname, phone_number, login, password, role, status FROM users WHERE id=?";
     private static final String REMOVE_USER_BY_ID = "DELETE FROM users WHERE id=?";
 
     @Override
@@ -62,20 +63,39 @@ public class UserDaoImpl<Connecton> implements UserDao {
     }
 
     @Override
-    public Optional<User> findUserById(int id) throws DaoException {
-        Optional<User> userOptional = Optional.empty();
+    public User findUserByPhone(int phone) throws DaoException{
+        User user= null;
+        try(Connection dbConnection = connectionPool.getConnection();
+        PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_USER_BY_PHONE))
+        {
+            preparedStatement.setInt(1, phone);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+                 user = UserCreator.create(resultSet);
+                //userOptional = Optional.of(user);
+            }
+            return user;
+        }catch (SQLException | DatabaseConnectionException e){
+            LOGGER.error("Exception while method findUserByPhone: " + e.getMessage());
+            throw new DaoException();
+        }
+    }
+
+    @Override
+    public User findUserById(int id) throws DaoException {
+        User user = null;
         try (Connection dbConnection = connectionPool.getConnection();
           PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_USER_BY_ID))
             {
             preparedStatement.setInt(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
             while(resultSet.next()){
-                User user = UserCreator.create(resultSet);
-                userOptional = Optional.of(user);
+                user = UserCreator.create(resultSet);
+                //userOptional = Optional.of(user);
             }
-         return userOptional;
+         return user;
         } catch (SQLException  | DatabaseConnectionException e) {
-            LOGGER.error("Exception while method getUserById: " + e.getMessage());
+            LOGGER.error("Exception while method findUserById: " + e.getMessage());
             throw new DaoException(e);
         }
     }

@@ -29,25 +29,48 @@ public class OrderDaoImpl implements OrderDao {
     ConnectionPool connectionPool = ConnectionPool.getInstance();
 
     private static final String CREATE_ORDER =
-            "INSERT into order (procedure_amount, discount, user_id, specialist_id, procedure_id, datetime_id) VALUES(?, ?, ?, ?, ?, ?)";
+            "INSERT into order (procedure_amount, discount, exect_price, user_id, specialist_id, procedure_id, datetime_id) VALUES(?, ?, ?, ?, ?, ?)";
+
     private static final String FIND_ORDER_BY_PROCEDURE_TYPE =   // will check
-            "SELECT o.order_id, o.procedure_amount, o.discount, o.user_id, o.specialist_id, o.procedure_id, o.datetime_id" +
-                    " FROM order o JOIN procedure p ON o.procedure_id = p.procedure_id WHERE p.pocedure_type = ?";
+            "SELECT o.order_id, o.procedure_amount, o.discount, o.exect_price, o.user_id, o.specialist_id, o.procedure_id, o.datetime_id" +
+                    " FROM orders o JOIN procedure p ON o.procedure_id = p.procedure_id WHERE p.pocedure_type = ?";
+
     private static final String FIND_ORDER_BY_USER_ID =
-            "SELECT order_id, procedure_amount, discount, user_id, specialist_id, procedure_id, datetime_id FROM order WHERE user_id=?";
+            "SELECT order_id, procedure_amount, discount, exect_price, user_id, specialist_id, procedure_id, datetime_id FROM order WHERE user_id=?";
+
     private static final String FIND_ORDER_BY_DATE =
-            "SELECT o.order_id, o.procedure_amount, o.discount, o.user_id, o.specialist_id, o.procedure_id, o.datetime_id" +
-                    " FROM order o JOIN datetime d ON o.datetime_id = d.datetime_id WHERE d.date = ?";
+            "SELECT o.order_id, o.procedure_amount, o.discount, o.exect_price, o.user_id, o.specialist_id, o.procedure_id, o.datetime_id" +
+                    " FROM orders o JOIN datetime d ON o.datetime_id = d.datetime_id WHERE d.date = ?";
+
     private static final String FIND_ORDER_BY_ORDER_ID =
-            "SELECT order_id, procedure_amount, discount, user_id, specialist_id, procedure_id, datetime_id FROM order WHERE order_id=?";
+            "SELECT order_id, procedure_amount, discount, exect_price,  user_id, specialist_id, procedure_id, datetime_id FROM orders WHERE order_id=?";
+
     private static final String FIND_ORDER_BY_SURNAME =  // will check
-            "SELECT o.order_id, o.procedure_amount, o.discount, o.user_id, o.specialist_id, o.procedure_id, o.datetime_id" +
-                    " FROM order o JOIN users u ON o.user_id = u.user_id WHERE u.surname = ?";
-//    private static final String CREATE_ORDER_BY_PROCEDURE_ID_USER_ID_DATE_ID =
-//            "INSERT INTO orders";  //fixme
-//    private static final String CREATE_ORDER_BY_DATE_USER =
-//            "INSERT INTO orders";  //fixme
+            "SELECT o.order_id, o.procedure_amount, o.discount, o.exect_price, o.user_id, o.specialist_id, o.procedure_id, o.datetime_id" +
+                    " FROM orders o JOIN users u ON o.user_id = u.user_id WHERE u.surname = ?";
+
     private static final String REMOVE_ORDER_BY_ID = "DELETE FROM orders WHERE  id=?";
+
+    private static final String FIND_PROCEDURE_AMOUNT = "SELECT COUNT(*) as count FROM orders WHERE user_id=?";
+
+    @Override
+    public int findProcedureAmountByUserId(int userId) throws DaoException {
+        int result = 0;
+        try(
+                Connection dbConnection = connectionPool.getConnection();
+                PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_PROCEDURE_AMOUNT))
+        {
+            preparedStatement.setInt(1, userId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while(resultSet.next()){
+              result = resultSet.getInt(1);
+            }
+        }catch(SQLException | DatabaseConnectionException e){
+            LOGGER.error("Exception thrown 'findProcedureAmountByUserId' method: " + e);
+            throw new DaoException(e);
+        }
+        return result;
+    }
 
     @Override
     public void createOrder(Order order) throws DaoException {
@@ -56,11 +79,12 @@ public class OrderDaoImpl implements OrderDao {
               PreparedStatement preparedStatement = dbConnection.prepareStatement(CREATE_ORDER))
       {
           preparedStatement.setInt(1, order.getProcedureAmount());
-          preparedStatement.setInt(2, order.getDiscount());
-          preparedStatement.setInt(3, order.getUserId());
-          preparedStatement.setInt(4, order.getSpecialistId());
-          preparedStatement.setInt(5, order.getProcedureId());
-          preparedStatement.setInt(6, order.getDatetimeId());
+          preparedStatement.setDouble(2, order.getDiscount());
+          preparedStatement.setBigDecimal(3,order.getExectPrice());
+          preparedStatement.setInt(4, order.getUserId());
+          preparedStatement.setInt(5, order.getSpecialistId());
+          preparedStatement.setInt(6, order.getProcedureId());
+          preparedStatement.setInt(7, order.getDatetimeId());
 
           preparedStatement.executeUpdate();
       }catch(SQLException | DatabaseConnectionException e){
@@ -77,19 +101,21 @@ public class OrderDaoImpl implements OrderDao {
                 PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_ORDER_BY_PROCEDURE_TYPE))
         {
           preparedStatement.setString(1, procedureType);
-          ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()) {
-                Order order = new Order();
-                order.setProcedureId(resultSet.getInt(ORDER_ID));
-                order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
-                order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
-                order.setUserId(resultSet.getInt(USER_ID));
-                order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));
-                order.setProcedureId(resultSet.getInt(PROCEDURE_ID));
-                order.setDatetimeId(resultSet.getInt(DATETIME_ID));
+         try(ResultSet resultSet = preparedStatement.executeQuery()) {
+             while (resultSet.next()) {
+                 Order order = OrderCreator.create(resultSet);
+//                Order order = new Order();
+//                order.setProcedureId(resultSet.getInt(ORDER_ID));
+//                order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
+//                order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
+//                order.setUserId(resultSet.getInt(USER_ID));
+//                order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));        ////????????????????????????/
+//                order.setProcedureId(resultSet.getInt(PROCEDURE_ID));
+//                order.setDatetimeId(resultSet.getInt(DATETIME_ID));
 
-                orders.add(order);
-            }
+                 orders.add(order);
+             }
+         }
             }catch(SQLException | DatabaseConnectionException e){
                 LOGGER.error("Exception thrown 'findOrderByProcedureType' method: " + e);
                 throw new DaoException(e);
@@ -99,23 +125,24 @@ public class OrderDaoImpl implements OrderDao {
 
 
     @Override
-    public Optional<Order> findOrderByUsersId(int userId) throws DaoException {
-        Optional<Order> order = Optional.empty();
+    public List<Order> findOrderByUserId(int userId) throws DaoException {
+        List<Order> orders = new ArrayList<>();
         try(
                 Connection dbConnection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_ORDER_BY_USER_ID))
         {
             preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-                Order orderOptional = OrderCreator.create(resultSet);
-                order = Optional.of(orderOptional);
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Order order = OrderCreator.create(resultSet);
+                    orders.add(order);
+                }
             }
-            return order;
         }catch(SQLException | DatabaseConnectionException e){
             LOGGER.error("Exception thrown 'findOrderByUsersId' method: " +e);
             throw new DaoException(e);
         }
+        return orders;
     }
 
     @Override
@@ -125,18 +152,20 @@ public class OrderDaoImpl implements OrderDao {
                 Connection dbConnection = connectionPool.getConnection();
                 PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_ORDER_BY_DATE)) {
             preparedStatement.setString(1, String.valueOf(date));
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                Order order = new Order();
-                order.setProcedureId(resultSet.getInt(ORDER_ID));
-                order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
-                order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
-                order.setUserId(resultSet.getInt(USER_ID));
-                order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));
-                order.setProcedureId(resultSet.getInt(PROCEDURE_ID));
-                order.setDatetimeId(resultSet.getInt(DATETIME_ID));
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Order order = OrderCreator.create(resultSet);
+//                Order order = new Order();
+//                order.setProcedureId(resultSet.getInt(ORDER_ID));
+//                order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
+//                order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
+//                order.setUserId(resultSet.getInt(USER_ID));                     //??????????????????
+//                order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));
+//                order.setProcedureId(resultSet.getInt(PROCEDURE_ID));
+//                order.setDatetimeId(resultSet.getInt(DATETIME_ID));
 
-                orders.add(order);
+                    orders.add(order);
+                }
             }
         } catch (SQLException | DatabaseConnectionException e) {
             LOGGER.error("Exception thrown 'findOrderByDate' method: " + e);
@@ -153,12 +182,13 @@ public class OrderDaoImpl implements OrderDao {
                 PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_ORDER_BY_ORDER_ID))
         {
             preparedStatement.setInt(1, orderId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-                Order orderOptional = OrderCreator.create(resultSet);
-                order = Optional.of(orderOptional);
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Order orderOptional = OrderCreator.create(resultSet);
+                    order = Optional.of(orderOptional);
+                }
+                return order;
             }
-            return order;
         }catch(SQLException | DatabaseConnectionException e){
             LOGGER.error("Exception thrown 'findOrderByOrderId' method: " +e);
             throw new DaoException(e);
@@ -173,18 +203,20 @@ public class OrderDaoImpl implements OrderDao {
                 PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_ORDER_BY_SURNAME))
         {
             preparedStatement.setString(1, surname);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()) {
-                Order order = new Order();
-                order.setProcedureId(resultSet.getInt(ORDER_ID));
-                order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
-                order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
-                order.setUserId(resultSet.getInt(USER_ID));
-                order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));
-                order.setProcedureId(resultSet.getInt(PROCEDURE_ID));
-                order.setDatetimeId(resultSet.getInt(DATETIME_ID));
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    Order order = OrderCreator.create(resultSet);
+//                Order order = new Order();
+//                order.setProcedureId(resultSet.getInt(ORDER_ID));
+//                order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
+//                order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
+//                order.setUserId(resultSet.getInt(USER_ID));
+//                order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));
+//                order.setProcedureId(resultSet.getInt(PROCEDURE_ID));        /////??????????????????
+//                order.setDatetimeId(resultSet.getInt(DATETIME_ID));
 
-                orders.add(order);
+                    orders.add(order);
+                }
             }
         }catch(SQLException | DatabaseConnectionException e){
             LOGGER.error("Exception thrown 'findOrderBySurname' method: " + e);
@@ -194,15 +226,17 @@ public class OrderDaoImpl implements OrderDao {
     }
 
     @Override
-    public void removeOrderById(int orderId) throws DaoException {
+    public boolean removeOrderById(int orderId) throws DaoException {
+        boolean isDeleted;
        try(Connection dbConnection = connectionPool.getConnection();
            PreparedStatement preparedStatement = dbConnection.prepareStatement(REMOVE_ORDER_BY_ID))
        {
            preparedStatement.setInt(1, orderId);
-           preparedStatement.executeUpdate();
+           isDeleted = preparedStatement.executeUpdate() == 1;
        }catch(SQLException | DatabaseConnectionException e){
            LOGGER.error("Exception thrown 'removeOrderById' method: " + e);
            throw new DaoException(e);
        }
+       return isDeleted;
     }
 }

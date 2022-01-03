@@ -2,65 +2,106 @@ package com.javacourse.specialist.service.impl;
 
 import com.javacourse.specialist.dao.DaoProvider;
 import com.javacourse.specialist.dao.UserDao;
-import com.javacourse.specialist.dao.mapper.UserCreator;
 import com.javacourse.specialist.entity.User;
 import com.javacourse.specialist.exception.DaoException;
 import com.javacourse.specialist.exception.ServiceException;
 import com.javacourse.specialist.service.UserService;
-import com.javacourse.specialist.validator.UserValidator;
+import com.javacourse.specialist.util.PasswordEncryptor;
+import com.javacourse.specialist.validator.Validator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.ResultSet;
 import java.util.List;
 import java.util.Optional;
 
 public class UserServiceImpl implements UserService{
     private static final Logger LOGGER = LogManager.getLogger();
-    private UserDao userDao = DaoProvider.getInstance().getUserDao();
-    @Override
-    public void addUser(String name, String surname, int phone) throws ServiceException {
+    private final UserDao userDao = DaoProvider.getInstance().getUserDao();
 
-        User user = null;
+    @Override
+    public boolean addUser(String name, String surname, String password, String phone) throws ServiceException {
+        boolean isAddUser = true;
+        User user;
         try {
-           if(user != userDao.findUserByPhone(phone)){
+           if(userDao.findUserByPhone(phone).isPresent()){
                LOGGER.info("Attemption to create existent user");
+               return !isAddUser;
            }else{
                user = new User();
-               if(UserValidator.isValidName(name)&& UserValidator.isValidSurname(surname)&&UserValidator.isValidPhone(String.valueOf(phone))){
+               if(Validator.isValidPassword(password) &&
+                       Validator.isValidName(name)&&
+                       Validator.isValidSurname(surname)&&
+                       Validator.isValidPhone(phone))
+               {
+                   String encryptedPassword = PasswordEncryptor.getInstance().getHash(password);
                    user.setPhoneNumber(phone);
                    user.setName(name);
                    user.setSurname(surname);
+                   user.setPassword(encryptedPassword);
                }
                user.setUserRole(User.UserRoles.CLIENT);
-               user.setPassword("????");
-               user.setLogin("????");
                user.setRegistrationStatus(User.RegistrationStatus.REGISTERED);
            }
-        } catch (DaoException e) {
-            throw new ServiceException();
-        }
 
-//        String login = user.getLogin();
-//        user.getName();
-//        user.getSurname();
-//        user.getPassword();
-//        user.getPhoneNumber();
-//        user.set
+        } catch (DaoException e) {
+            LOGGER.error("Exception while method 'addUser': " + e.getMessage());
+            throw new ServiceException(e);
+        }
+        return isAddUser;
     }
 
     @Override
-    public List<User> findAllUsers() throws ServiceException {
-        return null;
+    public boolean authenticate(String login, String password) throws ServiceException {
+        String userPass = "";
+        try {
+            if(Validator.isValidPhone(login) && Validator.isValidPassword(password)){
+               Optional <User> userOptional = userDao.findUserByPhone(login);
+               if(userOptional.isPresent()){
+                userPass = userOptional.get().getPassword();}
+            }
+        }catch(DaoException e){
+            LOGGER.error("Exception while method 'authenticate': " + e.getMessage());
+            throw new ServiceException(e);
+        }
+        String encryptedPassword = PasswordEncryptor.getInstance().getHash(password);
+        return PasswordEncryptor.getInstance().checkHash(encryptedPassword, userPass);
+    }
+
+    @Override
+    public List<User> findAllUser() throws ServiceException {
+        try {
+            return userDao.findAllUser();
+        } catch (DaoException e) {
+            LOGGER.error("Exception while method 'findAllUsers': " + e.getMessage());
+            throw new ServiceException(e);
+        }
     }
 
     @Override
     public Optional<User> findUserById(int id) throws ServiceException {
+        if (Validator.isValidId(String.valueOf(id))) {
+            try {
+                return userDao.findUserById(id);
+            } catch (DaoException e) {
+                LOGGER.error("Exception while method 'findUserById': " + e.getMessage());
+                throw new ServiceException(e);
+            }
+        }
         return Optional.empty();
     }
 
     @Override
-    public void removeUserById(int id) throws ServiceException {
-
+    public boolean removeUserById(int id) throws ServiceException {
+        boolean isRemove = true;
+        if (Validator.isValidId(String.valueOf(id))) {
+            try {
+                userDao.removeUserById(id);
+                return isRemove;
+            } catch (DaoException e) {
+                LOGGER.error("Exception while method 'removeUserById': " + e.getMessage());
+                throw new ServiceException(e);
+            }
+        }
+        return !isRemove;
     }
 }

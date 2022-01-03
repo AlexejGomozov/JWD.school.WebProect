@@ -11,11 +11,11 @@ public class UserCreator {
 
     public static User create(ResultSet resultSet) throws SQLException {
       User user = new User();
-      user.setLogin(resultSet.getString(LOGIN));
+        user.setId(resultSet.getInt(USER_ID));
       user.setPassword(resultSet.getString(PASSWORD));
       user.setName(resultSet.getString(NAME));
       user.setSurname(resultSet.getString(SURMAME));
-      user.setPhoneNumber(resultSet.getInt(PHONE_NUMBER));
+      user.setPhoneNumber(resultSet.getString(PHONE_NUMBER));
       user.setUserRole(User.UserRoles.valueOf(resultSet.getString(USER_ROLE).toUpperCase()));
       user.setRegistrationStatus(User.RegistrationStatus.valueOf((resultSet.getString((REGISTRATION_STATUS).toUpperCase()))));
 

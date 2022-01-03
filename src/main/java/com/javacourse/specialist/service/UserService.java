@@ -8,8 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
-    void addUser(String name, String surname, int phone) throws ServiceException;
-    List<User> findAllUsers() throws ServiceException;
+    boolean addUser(String name, String surname, String password, String phone) throws ServiceException;
+    boolean authenticate(String login, String password) throws ServiceException;
+    List<User> findAllUser() throws ServiceException;
     Optional<User> findUserById(int id) throws ServiceException;
-    void removeUserById(int id) throws ServiceException;
+    boolean removeUserById(int id) throws ServiceException;
 }

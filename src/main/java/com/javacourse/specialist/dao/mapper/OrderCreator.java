@@ -13,8 +13,10 @@ public class OrderCreator {
 
     public static Order create(ResultSet resultSet) throws SQLException {
         Order order = new Order();
+        order.setOrderId(resultSet.getInt(ORDER_ID));
         order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
         order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
+        order.setExectPrice(resultSet.getBigDecimal(ORDER_EXECT_PRICE));
         order.setUserId(resultSet.getInt(USER_ID));
         order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));
         order.setProcedureId(resultSet.getInt(PROCEDURE_ID));

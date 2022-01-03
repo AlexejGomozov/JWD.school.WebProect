@@ -1,9 +1,12 @@
 package com.javacourse.specialist.entity;
 
+import java.math.BigDecimal;
+
 public class Order {
     private int orderId;
     private int procedureAmount;
-    private int discount;
+    private double discount;
+    BigDecimal exectPrice;
     private int userId;
     private int specialistId;
     private int procedureId;
@@ -27,12 +30,20 @@ public class Order {
         this.procedureAmount = procedureAmount;
     }
 
-    public int getDiscount() {
+    public double getDiscount() {
         return discount;
     }
 
-    public void setDiscount(int discount) {
+    public void setDiscount(double discount) {
         this.discount = discount;
+    }
+
+    public BigDecimal getExectPrice() {
+        return exectPrice;
+    }
+
+    public void setExectPrice(BigDecimal exectPrice) {
+        this.exectPrice = exectPrice;
     }
 
     public int getUserId() {

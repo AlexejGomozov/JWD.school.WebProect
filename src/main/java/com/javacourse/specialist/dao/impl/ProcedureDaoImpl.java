@@ -13,9 +13,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.javacourse.specialist.dao.ColumnName.*;
 
@@ -25,9 +23,10 @@ public class ProcedureDaoImpl implements ProcedureDao {
 
     private static final String ADD_PROCEDURE = "INSERT INTO procedure (duration, price, procedure_type) VALUES(?, ?, ?)";
     private static final String FIND_PROCEDURE_BY_ID = "SELECT procedure_id, duration, price, procedure_type FROM procedure WHERE id=?";
+    private static final String FIND_PROCEDURE_BY_TYPE = "SELECT procedure_id, duration, price, procedure_type FROM procedure WHERE procedure_type=?";
     private static final String FIND_PROCEDURE_BY_USER_ID =
             "SELECT p.procedure_id, p.duration, p.price, p.procedure_type FROM procedure p " +
-                    "JOIN orders o ON p.procedure_id= o.procedure_id WHERE o.user_id=?";
+                    "JOIN orders o ON p.procedure_id=o.procedure_id WHERE o.user_id=?";
     private static final String REMOVE_PROCEDURE_BY_ID = "DELETE FROM procedure WHERE id=?";
 
 
@@ -57,16 +56,38 @@ public class ProcedureDaoImpl implements ProcedureDao {
                 PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_PROCEDURE_BY_ID))
         {
          preparedStatement.setInt(1, procedureId);
-         ResultSet resultSet = preparedStatement.executeQuery();
-         while(resultSet.next()){
-             Procedure procedureType = ProcedureCreator.create(resultSet);
-             procedure = Optional.of(procedureType);
+         try(ResultSet resultSet = preparedStatement.executeQuery()) {
+             while (resultSet.next()) {
+                 Procedure procedureType = ProcedureCreator.create(resultSet);
+                 procedure = Optional.of(procedureType);
+             }
+             return procedure;
          }
-         return procedure;
         }catch(SQLException | DatabaseConnectionException e){
             LOGGER.error("Exception thrown 'findProcedureById' method: " +e);
             throw new DaoException(e);
         }
+    }
+
+    @Override
+    public Set<Procedure> findAllProcedureByType(String procedureType) throws DaoException{
+       Set<Procedure> procedures = new HashSet<>();
+       try(
+               Connection dBconnection = connectionPool.getConnection();
+               PreparedStatement preparedStatement = dBconnection.prepareStatement(FIND_PROCEDURE_BY_TYPE))
+       {
+           preparedStatement.setString(1, procedureType);
+         try(ResultSet resultSet = preparedStatement.executeQuery()) {
+             while (resultSet.next()) {
+                 Procedure procedure = ProcedureCreator.create(resultSet);
+                 procedures.add(procedure);
+             }
+             return procedures;
+         }
+       }catch(SQLException | DatabaseConnectionException e) {
+           LOGGER.error("Exception thrown 'findAllProcedureByType' method: " +e);
+           throw new DaoException(e);
+       }
     }
 
     @Override
@@ -77,17 +98,20 @@ public class ProcedureDaoImpl implements ProcedureDao {
                 PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_PROCEDURE_BY_USER_ID))
         {
             preparedStatement.setInt(1, userId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-                Procedure procedure = new Procedure();
-                procedure.setProcedureId(resultSet.getInt(PROCEDURE_ID));
-                procedure.setDuration(resultSet.getInt(PROCEDURE_DURATION));
-                procedure.setPrice(resultSet.getBigDecimal(PROCEDURE_PRICE));
-                procedure.setProcedureType(resultSet.getString(PROCEDURE_TYPE));
+        try(ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                Procedure procedure = ProcedureCreator.create(resultSet);
+                //Procedure procedure = new Procedure();
+//                procedure.setProcedureId(resultSet.getInt(PROCEDURE_ID));
+//                procedure.setDuration(resultSet.getInt(PROCEDURE_DURATION));
+//                procedure.setPrice(resultSet.getBigDecimal(PROCEDURE_PRICE));  //
+//                изменить маппер? добавить PROCEDURE_ID ?  ???
+//                procedure.setProcedureType(resultSet.getString(PROCEDURE_TYPE));
 
                 procedures.add(procedure);
             }
             return procedures;
+        }
         }catch(SQLException | DatabaseConnectionException e){
             LOGGER.error("Exception thrown 'findProcedureByUserId' method: " +e);
             throw new DaoException(e);
@@ -99,7 +123,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
       try ( Connection dbConnection = connectionPool.getConnection();
             PreparedStatement preparedStatement = dbConnection.prepareStatement(REMOVE_PROCEDURE_BY_ID))
       {
-          preparedStatement.setInt(1, procedureId);
+          preparedStatement.setInt(1, procedureId);   // ?????
           preparedStatement.executeUpdate();
       }catch(SQLException | DatabaseConnectionException e){
           LOGGER.error("Exception thrown 'removeProcedureById' method: " + e);

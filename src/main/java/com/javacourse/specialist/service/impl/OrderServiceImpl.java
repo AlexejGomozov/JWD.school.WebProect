@@ -27,8 +27,7 @@ public class OrderServiceImpl implements OrderService {
    // private final UserDao userDao = DaoProvider.getInstance().getUserDao();
     private final ProcedureDao procedureDao = DaoProvider.getInstance().getProcedureDao();
 
-    //   ?????       Procedure procedure = new Procedure();
-    //   ?????       BigDecimal price = procedure.getPrice(); //куда поместить метод поиска точной цены??
+     //куда поместить метод поиска точной цены?? и метод поиска discount ? или здесь норм?
     // /*
 //    int userId;
 //    BigDecimal price;
@@ -47,7 +46,7 @@ public class OrderServiceImpl implements OrderService {
         return discount;
     }
 
-    protected BigDecimal findExactPrice (int userId, BigDecimal price) throws ServiceException{
+    private BigDecimal findExactPrice (int userId, BigDecimal price) throws ServiceException{
         double discount = findDiscount(userId);
         BigDecimal discountBDecimal = BigDecimal.valueOf(discount);
        return  discountBDecimal.multiply(price);
@@ -97,7 +96,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> findOrderByProcedureType(String procedureType) throws ServiceException {
-       // List<Order> orderList = null;
        if(ProcedureValidator.isValidName(procedureType)) {
            try {
               return orderDao.findOrderByProcedureType(procedureType);
@@ -110,7 +108,6 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Optional<Order> findOrderByUsersId(int userId) throws ServiceException {
-       // userId  -  писать int или String
        if(Validator.isValidId(String.valueOf(userId))){
            try {
                return orderDao.findOrderByOrderId(userId);

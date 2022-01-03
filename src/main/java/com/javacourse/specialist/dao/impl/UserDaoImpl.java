@@ -106,7 +106,7 @@ public class UserDaoImpl implements UserDao {
               PreparedStatement  preparedStatement = dbConnection.prepareStatement(REMOVE_USER_BY_ID))
              {
               preparedStatement.setInt( 1, id);
-                 isDeleted = preparedStatement.executeUpdate() == 1;   ////??????
+                 isDeleted = preparedStatement.executeUpdate() == 1;
           }catch(SQLException | DatabaseConnectionException e){
             LOGGER.error("Exception while method 'removeUserById': " + e.getMessage());
             throw new DaoException(e);

@@ -101,13 +101,6 @@ public class ProcedureDaoImpl implements ProcedureDao {
         try(ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
                 Procedure procedure = ProcedureCreator.create(resultSet);
-                //Procedure procedure = new Procedure();
-//                procedure.setProcedureId(resultSet.getInt(PROCEDURE_ID));
-//                procedure.setDuration(resultSet.getInt(PROCEDURE_DURATION));
-//                procedure.setPrice(resultSet.getBigDecimal(PROCEDURE_PRICE));  //
-//                изменить маппер? добавить PROCEDURE_ID ?  ???
-//                procedure.setProcedureType(resultSet.getString(PROCEDURE_TYPE));
-
                 procedures.add(procedure);
             }
             return procedures;
@@ -123,7 +116,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
       try ( Connection dbConnection = connectionPool.getConnection();
             PreparedStatement preparedStatement = dbConnection.prepareStatement(REMOVE_PROCEDURE_BY_ID))
       {
-          preparedStatement.setInt(1, procedureId);   // ?????
+          preparedStatement.setInt(1, procedureId);
           preparedStatement.executeUpdate();
       }catch(SQLException | DatabaseConnectionException e){
           LOGGER.error("Exception thrown 'removeProcedureById' method: " + e);

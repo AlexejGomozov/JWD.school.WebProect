@@ -104,15 +104,6 @@ public class OrderDaoImpl implements OrderDao {
          try(ResultSet resultSet = preparedStatement.executeQuery()) {
              while (resultSet.next()) {
                  Order order = OrderCreator.create(resultSet);
-//                Order order = new Order();
-//                order.setProcedureId(resultSet.getInt(ORDER_ID));
-//                order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
-//                order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
-//                order.setUserId(resultSet.getInt(USER_ID));
-//                order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));        ////????????????????????????/
-//                order.setProcedureId(resultSet.getInt(PROCEDURE_ID));
-//                order.setDatetimeId(resultSet.getInt(DATETIME_ID));
-
                  orders.add(order);
              }
          }
@@ -155,15 +146,6 @@ public class OrderDaoImpl implements OrderDao {
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     Order order = OrderCreator.create(resultSet);
-//                Order order = new Order();
-//                order.setProcedureId(resultSet.getInt(ORDER_ID));
-//                order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
-//                order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
-//                order.setUserId(resultSet.getInt(USER_ID));                     //??????????????????
-//                order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));
-//                order.setProcedureId(resultSet.getInt(PROCEDURE_ID));
-//                order.setDatetimeId(resultSet.getInt(DATETIME_ID));
-
                     orders.add(order);
                 }
             }
@@ -206,15 +188,6 @@ public class OrderDaoImpl implements OrderDao {
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     Order order = OrderCreator.create(resultSet);
-//                Order order = new Order();
-//                order.setProcedureId(resultSet.getInt(ORDER_ID));
-//                order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));
-//                order.setDiscount(resultSet.getInt(ORDER_DISCOUNT));
-//                order.setUserId(resultSet.getInt(USER_ID));
-//                order.setSpecialistId(resultSet.getInt(SPECIALIST_ID));
-//                order.setProcedureId(resultSet.getInt(PROCEDURE_ID));        /////??????????????????
-//                order.setDatetimeId(resultSet.getInt(DATETIME_ID));
-
                     orders.add(order);
                 }
             }

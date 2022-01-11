@@ -13,6 +13,7 @@ public interface ProcedureService {
     boolean addProcedure(int duration, BigDecimal price, String procedureType);
     Optional<Procedure> findProcedureById(int procedureId) throws ServiceException;
     List<Procedure> findProcedureByUserId(int userId) throws ServiceException;
+    List<Procedure> findAllProcedure(int userId) throws ServiceException;
     Set<Procedure> findAllProcedureByType(String procedureType) throws ServiceException;
     boolean removeProcedureById(int procedureId) throws ServiceException;
 }

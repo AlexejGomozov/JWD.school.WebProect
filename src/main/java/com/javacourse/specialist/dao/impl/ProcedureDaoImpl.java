@@ -3,16 +3,15 @@ package com.javacourse.specialist.dao.impl;
 import com.javacourse.specialist.connection.ConnectionPool;
 import com.javacourse.specialist.dao.ProcedureDao;
 import com.javacourse.specialist.dao.mapper.ProcedureCreator;
+import com.javacourse.specialist.dao.mapper.UserCreator;
 import com.javacourse.specialist.entity.Procedure;
+import com.javacourse.specialist.entity.User;
 import com.javacourse.specialist.exception.DaoException;
 import com.javacourse.specialist.exception.DatabaseConnectionException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 import static com.javacourse.specialist.dao.ColumnName.*;
@@ -34,6 +33,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
     private static final String ADD_PROCEDURE = "INSERT INTO procedure (duration, price, procedure_type) VALUES(?, ?, ?)";
     private static final String FIND_PROCEDURE_BY_ID = "SELECT procedure_id, duration, price, procedure_type FROM procedure WHERE id=?";
     private static final String FIND_PROCEDURE_BY_TYPE = "SELECT procedure_id, duration, price, procedure_type FROM procedure WHERE procedure_type=?";
+    private static final String FIND_ALL_PROCEDURE = "SELECT procedure_id, duration, price, procedure_type FROM procedure";
     private static final String FIND_PROCEDURE_BY_USER_ID =
             "SELECT p.procedure_id, p.duration, p.price, p.procedure_type FROM procedure p " +
                     "JOIN orders o ON p.procedure_id=o.procedure_id WHERE o.user_id=?";
@@ -98,6 +98,24 @@ public class ProcedureDaoImpl implements ProcedureDao {
            LOGGER.error("Exception thrown 'findAllProcedureByType' method: " +e);
            throw new DaoException(e);
        }
+    }
+
+    @Override
+    public List<Procedure> findAllProcedure() throws DaoException {
+        List<Procedure> procedures = new ArrayList<>();
+        try (Connection dbConnection = connectionPool.getConnection();
+             Statement statement = dbConnection.createStatement();
+             ResultSet resultSet = statement.executeQuery(FIND_ALL_PROCEDURE))
+        {
+            while(resultSet.next()){
+                Procedure procedure = ProcedureCreator.getInstance().create(resultSet);  ////getInstance() ??????
+                procedures.add(procedure);
+            }
+            return procedures;
+        } catch (SQLException | DatabaseConnectionException e) {
+            LOGGER.error("Exception while method 'findAllUser': " + e.getMessage());
+            throw new DaoException(e);
+        }
     }
 
     @Override

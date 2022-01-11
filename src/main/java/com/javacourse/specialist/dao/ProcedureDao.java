@@ -11,6 +11,7 @@ public interface ProcedureDao {
     void addProcedure(Procedure procedure) throws DaoException;
     Optional<Procedure> findProcedureById(int procedureId) throws DaoException;
     Set<Procedure> findAllProcedureByType(String procedureType) throws DaoException;
+    List<Procedure> findAllProcedure() throws DaoException;
     List<Procedure> findProcedureByUserId(int userId) throws DaoException;
     void removeProcedureById(int procedureId) throws DaoException;
 }

@@ -24,21 +24,16 @@ import java.util.Optional;
 public class OrderServiceImpl implements OrderService {
     private static final Logger LOGGER = LogManager.getLogger();
     private final OrderDao orderDao = DaoProvider.getInstance().getOrderDao();
-   // private final UserDao userDao = DaoProvider.getInstance().getUserDao();
     private final ProcedureDao procedureDao = DaoProvider.getInstance().getProcedureDao();
-
-     //куда поместить метод поиска точной цены?? и метод поиска discount ? или здесь норм?
-    // /*
-//    int userId;
-//    BigDecimal price;
-//     double discount = findDiscount(userId);
-//     BigDecimal exactPrice = findExactPrice(discount, price);
-
+    private static final int FIVE_PROCEDURES = 5;
+    private static final double DISCOUNT_AFTER_FIVE_PROCEDURES = 0.5;
+    private static final double NO_DISCOUNT = 1
+            ;
    private double findDiscount(int userId) throws ServiceException{
-       double discount = 1;
+       double discount = NO_DISCOUNT;
        try {
             int procedureAmount = orderDao.findProcedureAmountByUserId(userId);
-            if(procedureAmount % 5 == 0) {discount = 0.5;}
+            if(procedureAmount % FIVE_PROCEDURES == 0) {discount = DISCOUNT_AFTER_FIVE_PROCEDURES;}
         } catch (DaoException e) {
             LOGGER.error("Exception while method 'findDiscount': " + e.getMessage());
             throw new ServiceException(e);
@@ -74,8 +69,6 @@ public class OrderServiceImpl implements OrderService {
         }catch(DaoException e){
             throw new ServiceException(e);
         }
-     // Order order = new Order();   // где лучше разместить объявление order ?
-
                    if(
                         validator.isValid(String.valueOf(userId))&&
                         validator.isValid(String.valueOf(specialistId))&&

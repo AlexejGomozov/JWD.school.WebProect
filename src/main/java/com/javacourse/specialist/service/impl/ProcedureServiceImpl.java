@@ -72,6 +72,16 @@ public class ProcedureServiceImpl implements ProcedureService {
     }
 
     @Override
+    public List<Procedure> findAllProcedure(int userId) throws ServiceException {
+        try {
+            return procedureDao.findAllProcedure();
+        } catch (DaoException e) {
+            LOGGER.error("Exception while method 'findAllUsers': " + e.getMessage());
+            throw new ServiceException(e);
+        }
+    }
+
+    @Override
     public Set<Procedure> findAllProcedureByType(String procedureType) throws ServiceException {
         final ProcedureValidator procedureValidator = ProcedureValidator.getInstance();
         if (procedureValidator.isValidName(procedureType)) {

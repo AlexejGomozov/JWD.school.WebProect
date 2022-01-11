@@ -62,6 +62,7 @@ public class OrderServiceImpl implements OrderService {
         BigDecimal price;
         BigDecimal exactPrice = null;
         int procedureAmount;
+        final Validator validator = Validator.getInstance();
 
         try {
            Optional <Procedure> procedure = procedureDao.findProcedureById(procedureId);
@@ -74,12 +75,13 @@ public class OrderServiceImpl implements OrderService {
             throw new ServiceException(e);
         }
      // Order order = new Order();   // где лучше разместить объявление order ?
-            if(
-               Validator.isValid(String.valueOf(userId))&&
-               Validator.isValid(String.valueOf(specialistId))&&
-               Validator.isValid(String.valueOf(procedureId))&&
-               Validator.isValid(String.valueOf(datetimeId)))
-            {
+
+                   if(
+                        validator.isValid(String.valueOf(userId))&&
+                        validator.isValid(String.valueOf(specialistId))&&
+                        validator.isValid(String.valueOf(procedureId))&&
+                        validator.isValid(String.valueOf(datetimeId)))
+                   {
 
            order.setProcedureAmount(procedureAmount);
            order.setDiscount(discount);
@@ -96,7 +98,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> findOrderByProcedureType(String procedureType) throws ServiceException {
-       if(ProcedureValidator.isValidName(procedureType)) {
+       final ProcedureValidator procedureValidator = ProcedureValidator.getInstance();
+        if(procedureValidator.isValidName(procedureType)) {
            try {
               return orderDao.findOrderByProcedureType(procedureType);
            } catch (DaoException e) {
@@ -108,7 +111,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Optional<Order> findOrderByUsersId(int userId) throws ServiceException {
-       if(Validator.isValidId(String.valueOf(userId))){
+        final Validator validator = Validator.getInstance();
+        if(validator.isValidId(String.valueOf(userId))){
            try {
                return orderDao.findOrderByOrderId(userId);
            } catch (DaoException e) {
@@ -120,7 +124,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> findOrderByDate(LocalDateTime date) throws ServiceException {
-        if(Validator.isValidId(String.valueOf(date))) {
+        final Validator validator = Validator.getInstance();
+        if(validator.isValidId(String.valueOf(date))) {
             try {
                 return orderDao.findOrderByDate(date);
             } catch (DaoException e) {
@@ -132,7 +137,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public Optional<Order> findOrderByOrderId(int orderId) throws ServiceException {
-       if(Validator.isValidId(String.valueOf(orderId))) {
+        final Validator validator = Validator.getInstance();
+       if(validator.isValidId(String.valueOf(orderId))) {
            try {
                return orderDao.findOrderByOrderId(orderId);
            } catch (DaoException e) {
@@ -144,7 +150,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<Order> findOrderBySurname(String surname) throws ServiceException {
-       if(Validator.isValidSurname(surname)) {
+        final Validator validator = Validator.getInstance();
+       if(validator.isValidSurname(surname)) {
            try {
                return orderDao.findOrderBySurname(surname);
            } catch (DaoException e) {
@@ -156,8 +163,9 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public boolean removeOrderById(int orderId) throws ServiceException {
+        final Validator validator = Validator.getInstance();
         boolean isDeleted = true;
-        if(Validator.isValidId(String.valueOf(orderId))) {
+        if(validator.isValidId(String.valueOf(orderId))) {
             try {
                 return orderDao.removeOrderById(orderId);
             } catch (DaoException e) {

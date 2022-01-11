@@ -6,9 +6,9 @@ import com.javacourse.specialist.dao.impl.UserDaoImpl;
 import com.javacourse.specialist.entity.Procedure;
 
 public class DaoProvider {
-    private UserDao userDao = new UserDaoImpl();
-    private OrderDao orderDao = new OrderDaoImpl();
-    private ProcedureDao procedureDao = new ProcedureDaoImpl();
+    private UserDao userDao = UserDaoImpl.getInstance();
+    private OrderDao orderDao = OrderDaoImpl.getInstance();
+    private ProcedureDao procedureDao = ProcedureDaoImpl.getInstance();
 
     private DaoProvider(){}
 

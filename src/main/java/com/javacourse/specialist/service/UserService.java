@@ -12,5 +12,6 @@ public interface UserService {
     boolean authenticate(String login, String password) throws ServiceException;
     List<User> findAllUser() throws ServiceException;
     Optional<User> findUserById(int id) throws ServiceException;
+    boolean singOut(String login) throws ServiceException;
     boolean removeUserById(int id) throws ServiceException;
 }

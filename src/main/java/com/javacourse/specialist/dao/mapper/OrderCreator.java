@@ -8,10 +8,15 @@ import java.sql.SQLException;
 import static com.javacourse.specialist.dao.ColumnName.*;
 
 public class OrderCreator {
-
+     private static OrderCreator instance;
     private OrderCreator(){}
-
-    public static Order create(ResultSet resultSet) throws SQLException {
+      public static OrderCreator getInstance(){
+        if(instance == null){
+            instance = new OrderCreator();
+        }
+        return instance;
+      }
+    public Order create(ResultSet resultSet) throws SQLException {
         Order order = new Order();
         order.setOrderId(resultSet.getInt(ORDER_ID));
         order.setProcedureAmount(resultSet.getInt(ORDER_PROCEDURE_AMOUNT));

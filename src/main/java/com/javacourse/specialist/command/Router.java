@@ -1,10 +1,10 @@
-package com.javacourse.specialist.controller;
+package com.javacourse.specialist.command;
 
 public class Router {
     public enum RouteType{
-        FORWARD, PROTECT
+        FORWARD, REDIRECT
     }
-    private String pagePath;
+    private String pagePath;    // по умолчанию тоже some индекс
     private RouteType route = RouteType.FORWARD;
 
     public String getPagePath() {

@@ -19,7 +19,17 @@ import static com.javacourse.specialist.dao.ColumnName.*;
 
 public class ProcedureDaoImpl implements ProcedureDao {
     private static final Logger LOGGER = LogManager.getLogger();
-    ConnectionPool connectionPool = ConnectionPool.getInstance();
+    private static ProcedureDaoImpl instance;
+   private final ConnectionPool connectionPool = ConnectionPool.getInstance();
+
+   private ProcedureDaoImpl(){}
+
+    public static ProcedureDaoImpl getInstance(){
+       if(instance == null){
+           instance = new ProcedureDaoImpl();
+       }
+       return instance;
+    }
 
     private static final String ADD_PROCEDURE = "INSERT INTO procedure (duration, price, procedure_type) VALUES(?, ?, ?)";
     private static final String FIND_PROCEDURE_BY_ID = "SELECT procedure_id, duration, price, procedure_type FROM procedure WHERE id=?";
@@ -58,7 +68,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
          preparedStatement.setInt(1, procedureId);
          try(ResultSet resultSet = preparedStatement.executeQuery()) {
              while (resultSet.next()) {
-                 Procedure procedureType = ProcedureCreator.create(resultSet);
+                 Procedure procedureType = ProcedureCreator.getInstance().create(resultSet);   ///getInstance() ????
                  procedure = Optional.of(procedureType);
              }
              return procedure;
@@ -79,7 +89,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
            preparedStatement.setString(1, procedureType);
          try(ResultSet resultSet = preparedStatement.executeQuery()) {
              while (resultSet.next()) {
-                 Procedure procedure = ProcedureCreator.create(resultSet);
+                 Procedure procedure = ProcedureCreator.getInstance().create(resultSet);   ///getInstance() ???
                  procedures.add(procedure);
              }
              return procedures;
@@ -100,7 +110,7 @@ public class ProcedureDaoImpl implements ProcedureDao {
             preparedStatement.setInt(1, userId);
         try(ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-                Procedure procedure = ProcedureCreator.create(resultSet);
+                Procedure procedure = ProcedureCreator.getInstance().create(resultSet);   // getInstance()???
                 procedures.add(procedure);
             }
             return procedures;

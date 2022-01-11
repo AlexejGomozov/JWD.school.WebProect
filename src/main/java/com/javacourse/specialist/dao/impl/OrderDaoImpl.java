@@ -26,7 +26,17 @@ import static com.javacourse.specialist.dao.ColumnName.*;
 
 public class OrderDaoImpl implements OrderDao {
     private static final Logger LOGGER = LogManager.getLogger();
-    ConnectionPool connectionPool = ConnectionPool.getInstance();
+    private static OrderDaoImpl instance;
+    private final ConnectionPool connectionPool = ConnectionPool.getInstance();
+
+    private OrderDaoImpl(){}
+
+    public static OrderDaoImpl getInstance(){
+        if(instance == null){
+            instance = new OrderDaoImpl();
+        }
+        return instance;
+    }
 
     private static final String CREATE_ORDER =
             "INSERT into order (procedure_amount, discount, exect_price, user_id, specialist_id, procedure_id, datetime_id) VALUES(?, ?, ?, ?, ?, ?)";
@@ -103,7 +113,7 @@ public class OrderDaoImpl implements OrderDao {
           preparedStatement.setString(1, procedureType);
          try(ResultSet resultSet = preparedStatement.executeQuery()) {
              while (resultSet.next()) {
-                 Order order = OrderCreator.create(resultSet);
+                 Order order = OrderCreator.getInstance().create(resultSet);     //getInstance() ????
                  orders.add(order);
              }
          }
@@ -125,7 +135,7 @@ public class OrderDaoImpl implements OrderDao {
             preparedStatement.setInt(1, userId);
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    Order order = OrderCreator.create(resultSet);
+                    Order order = OrderCreator.getInstance().create(resultSet);   //getInstance() ???
                     orders.add(order);
                 }
             }
@@ -145,7 +155,7 @@ public class OrderDaoImpl implements OrderDao {
             preparedStatement.setString(1, String.valueOf(date));
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    Order order = OrderCreator.create(resultSet);
+                    Order order = OrderCreator.getInstance().create(resultSet);   //getInstance()???
                     orders.add(order);
                 }
             }
@@ -166,7 +176,7 @@ public class OrderDaoImpl implements OrderDao {
             preparedStatement.setInt(1, orderId);
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    Order orderOptional = OrderCreator.create(resultSet);
+                    Order orderOptional = OrderCreator.getInstance().create(resultSet);   ///getInstance()???
                     order = Optional.of(orderOptional);
                 }
                 return order;
@@ -187,7 +197,7 @@ public class OrderDaoImpl implements OrderDao {
             preparedStatement.setString(1, surname);
             try(ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    Order order = OrderCreator.create(resultSet);
+                    Order order = OrderCreator.getInstance().create(resultSet);    //getInstance() ???
                     orders.add(order);
                 }
             }

@@ -8,10 +8,17 @@ import java.sql.SQLException;
 import static com.javacourse.specialist.dao.ColumnName.*;
 
 public class ProcedureCreator {
-
+    private static ProcedureCreator instance;
     private ProcedureCreator(){}
 
-    public static Procedure create(ResultSet resultSet) throws SQLException {
+    public static ProcedureCreator getInstance(){
+        if(instance == null){
+            instance = new ProcedureCreator();
+        }
+        return instance;
+    }
+
+    public Procedure create(ResultSet resultSet) throws SQLException {
         Procedure procedure = new Procedure();
         procedure.setProcedureId(resultSet.getInt(PROCEDURE_ID));
         procedure.setDuration(resultSet.getInt(PROCEDURE_DURATION));

@@ -15,13 +15,46 @@ import java.util.Optional;
 
 public class UserDaoImpl implements UserDao {
     private static final Logger LOGGER = LogManager.getLogger();
-    ConnectionPool connectionPool = ConnectionPool.getInstance();
+    private static UserDaoImpl instance;
+    private final ConnectionPool connectionPool = ConnectionPool.getInstance();
 
+    private UserDaoImpl(){}
+
+    public static UserDaoImpl getInstance(){
+        if(instance == null){
+            instance = new UserDaoImpl();
+        }
+        return instance;
+    }
+
+    private static final String FIND_USER_BY_PHONE_AND_PASSWORD = "SELECT id, name, surname, phone_number, password, role, status FROM users WHERE phone_number=? AND password=?";
     private static final String ADD_USER = "INSERT INTO users (name, surname, phone_number, password, role, status) VALUES(?, ?, ?, ?, ?, ?)";
     private static final String FIND_ALL_USERS = "SELECT id, name, surname, phone_number, password, role, status FROM users";
     private static final String FIND_USER_BY_PHONE = "SELECT id, name, surname, phone_number, password, role, status FROM users WHERE phone_number=?";
     private static final String FIND_USER_BY_ID = "SELECT id, name, surname, phone_number, password, role, status FROM users WHERE id=?";
     private static final String REMOVE_USER_BY_ID = "DELETE FROM users WHERE id=?";
+
+    @Override
+    public Optional<User> signIn(String phoneNumber, String password) throws DaoException {
+
+        Optional<User> userOptional = Optional.empty();
+        try(Connection dbConnection = connectionPool.getConnection();
+            PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_USER_BY_PHONE_AND_PASSWORD))
+        {
+            preparedStatement.setString(1, phoneNumber);
+            preparedStatement.setString(2, password);
+           try( ResultSet resultSet = preparedStatement.executeQuery()) {
+               while (resultSet.next()) {
+                   User user = UserCreator.getInstance().create(resultSet);  ///// getInstance() ?????
+                   userOptional = Optional.of(user);
+               }
+               return userOptional;
+           }
+        }catch (SQLException | DatabaseConnectionException e){
+            LOGGER.error("Exception while method findUserByPhone: " + e.getMessage());
+            throw new DaoException();
+        }
+    }
 
     @Override
     public void addUser(User user) throws DaoException {
@@ -51,7 +84,7 @@ public class UserDaoImpl implements UserDao {
             ResultSet resultSet = statement.executeQuery(FIND_ALL_USERS))
             {
             while(resultSet.next()){
-                User user = UserCreator.create(resultSet);
+                User user = UserCreator.getInstance().create(resultSet);  ////getInstance() ??????
                 users.add(user);
             }
             return users;
@@ -68,12 +101,13 @@ public class UserDaoImpl implements UserDao {
         PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_USER_BY_PHONE))
         {
             preparedStatement.setString(1, phone);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-                User user = UserCreator.create(resultSet);
-                userOptional = Optional.of(user);
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    User user = UserCreator.getInstance().create(resultSet);     ////getInstance()???
+                    userOptional = Optional.of(user);
+                }
+                return userOptional;
             }
-            return userOptional;
         }catch (SQLException | DatabaseConnectionException e){
             LOGGER.error("Exception while method findUserByPhone: " + e.getMessage());
             throw new DaoException();
@@ -87,12 +121,13 @@ public class UserDaoImpl implements UserDao {
           PreparedStatement preparedStatement = dbConnection.prepareStatement(FIND_USER_BY_ID))
             {
             preparedStatement.setInt(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while(resultSet.next()){
-               User user = UserCreator.create(resultSet);
-                userOptional = Optional.of(user);
+            try(ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    User user = UserCreator.getInstance().create(resultSet);    ///getInstance() ????
+                    userOptional = Optional.of(user);
+                }
+                return userOptional;
             }
-         return userOptional;
         } catch (SQLException  | DatabaseConnectionException e) {
             LOGGER.error("Exception while method findUserById: " + e.getMessage());
             throw new DaoException(e);

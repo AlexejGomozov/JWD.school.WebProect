@@ -21,11 +21,12 @@ public class ProcedureServiceImpl implements ProcedureService {
     @Override
     public boolean addProcedure(int duration, BigDecimal price, String procedureType)  {
         boolean isAddProcedure = true;
+        final ProcedureValidator procedureValidator = ProcedureValidator.getInstance();
         Procedure procedure;
             procedure = new Procedure();
-            if (ProcedureValidator.isValidName(procedureType) &&
-                    ProcedureValidator.isValidPrice(String.valueOf(price)) &&
-                    ProcedureValidator.isValidDuration(String.valueOf(duration))) {
+        if (procedureValidator.isValidName(procedureType) &&
+                    procedureValidator.isValidPrice(String.valueOf(price)) &&
+                    procedureValidator.isValidDuration(String.valueOf(duration))) {
                 procedure.setProcedureType(procedureType);
                 procedure.setPrice(price);
                 procedure.setDuration(duration);
@@ -39,7 +40,8 @@ public class ProcedureServiceImpl implements ProcedureService {
     @Override
     public Optional<Procedure> findProcedureById(int procedureId) throws ServiceException {
         Optional<Procedure> procedureOptional;
-        if(ProcedureValidator.isValidID(String.valueOf(procedureId))) {
+        final ProcedureValidator procedureValidator = ProcedureValidator.getInstance();
+        if(procedureValidator.isValidID(String.valueOf(procedureId))) {
             try {
                 procedureOptional = procedureDao.findProcedureById(procedureId);
                 if (procedureOptional.isPresent()) {
@@ -57,7 +59,8 @@ public class ProcedureServiceImpl implements ProcedureService {
 
     @Override
     public List<Procedure> findProcedureByUserId(int userId) throws ServiceException {
-        if (ProcedureValidator.isValidID(String.valueOf(userId))) {
+        final ProcedureValidator procedureValidator = ProcedureValidator.getInstance();
+        if (procedureValidator.isValidID(String.valueOf(userId))) {
             try {
               return procedureDao.findProcedureByUserId(userId);
             } catch (DaoException e) {
@@ -70,7 +73,8 @@ public class ProcedureServiceImpl implements ProcedureService {
 
     @Override
     public Set<Procedure> findAllProcedureByType(String procedureType) throws ServiceException {
-        if (ProcedureValidator.isValidName(procedureType)) {
+        final ProcedureValidator procedureValidator = ProcedureValidator.getInstance();
+        if (procedureValidator.isValidName(procedureType)) {
             try {
                 return procedureDao.findAllProcedureByType(procedureType);
             } catch (DaoException e) {
@@ -84,7 +88,8 @@ public class ProcedureServiceImpl implements ProcedureService {
     @Override
     public boolean removeProcedureById(int procedureId) throws ServiceException {
         boolean isRemoveProcedureById = true;
-        if (ProcedureValidator.isValidID(String.valueOf(procedureId))) {
+        final ProcedureValidator procedureValidator = ProcedureValidator.getInstance();
+        if (procedureValidator.isValidID(String.valueOf(procedureId))) {
             try {
                 procedureDao.removeProcedureById(procedureId);
                 return isRemoveProcedureById;

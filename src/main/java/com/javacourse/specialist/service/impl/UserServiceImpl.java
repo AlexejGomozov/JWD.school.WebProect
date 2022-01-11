@@ -18,9 +18,11 @@ public class UserServiceImpl implements UserService{
     private static final Logger LOGGER = LogManager.getLogger();
     private final UserDao userDao = DaoProvider.getInstance().getUserDao();
 
+
     @Override
     public boolean addUser(String name, String surname, String password, String phone) throws ServiceException {
         boolean isAddUser = true;
+        final Validator validator = Validator.getInstance();
         User user;
         try {
            if(userDao.findUserByPhone(phone).isPresent()){
@@ -28,10 +30,10 @@ public class UserServiceImpl implements UserService{
                return !isAddUser;
            }else{
                user = new User();
-               if(Validator.isValidPassword(password) &&
-                       Validator.isValidName(name)&&
-                       Validator.isValidSurname(surname)&&
-                       Validator.isValidPhone(phone))
+               if(validator.isValidPassword(password) &&
+                       validator.isValidName(name)&&
+                       validator.isValidSurname(surname)&&
+                       validator.isValidPhone(phone))
                {
                    String encryptedPassword = PasswordEncryptor.getInstance().getHash(password);
                    user.setPhoneNumber(phone);
@@ -53,8 +55,9 @@ public class UserServiceImpl implements UserService{
     @Override
     public boolean authenticate(String login, String password) throws ServiceException {
         String userPass = "";
+        final Validator validator = Validator.getInstance();
         try {
-            if(Validator.isValidPhone(login) && Validator.isValidPassword(password)){
+            if(validator.isValidPhone(login) && validator.isValidPassword(password)){
                Optional <User> userOptional = userDao.findUserByPhone(login);
                if(userOptional.isPresent()){
                 userPass = userOptional.get().getPassword();}
@@ -79,7 +82,8 @@ public class UserServiceImpl implements UserService{
 
     @Override
     public Optional<User> findUserById(int id) throws ServiceException {
-        if (Validator.isValidId(String.valueOf(id))) {
+        final Validator validator = Validator.getInstance();
+        if (validator.isValidId(String.valueOf(id))) {
             try {
                 return userDao.findUserById(id);
             } catch (DaoException e) {
@@ -91,9 +95,15 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
+    public boolean singOut(String login) throws ServiceException {
+        return false;
+    }
+
+    @Override
     public boolean removeUserById(int id) throws ServiceException {
         boolean isRemove = true;
-        if (Validator.isValidId(String.valueOf(id))) {
+        final Validator validator = Validator.getInstance();
+        if (validator.isValidId(String.valueOf(id))) {
             try {
                 userDao.removeUserById(id);
                 return isRemove;
